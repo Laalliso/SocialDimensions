@@ -1,0 +1,187 @@
+Country Code,Country ,Merge ,World Bank Name,Country Title,Left Overs form WB Data Set
+8,Albania,Albania,Albania,Albania,Afghanistan
+12,Algeria,Algeria,Algeria,Algeria,Antigua and Barbuda
+16,American Samoa,American Samoa,American Samoa,American Samoa,Arab World
+20,Andorra,Andorra,Andorra,Andorra,"Bahamas, The"
+24,Angola,Angola,Angola,Angola,Benin
+28,Antigua,,Antigua and Barbuda,Antigua and Barbuda,Bosnia and Herzegovina
+31,Azerbaijan,Azerbaijan,Azerbaijan,Azerbaijan,Cayman Islands
+32,Argentina,Argentina,Argentina,Argentina,British Virgin Islands
+36,Australia,Australia,Australia,Australia,Cabo Verde
+40,Austria,Austria,Austria,Austria,Caribbean small states
+48,Bahrain,Bahrain,Bahrain,Bahrain,Central African Republic
+50,Bangladesh,Bangladesh,Bangladesh,Bangladesh,Central Europe and the Baltics
+51,Armenia,Armenia,Armenia,Armenia,Brunei Darussalam
+52,Barbados,Barbados,Barbados,Barbados,Channel Islands
+56,Belgium,Belgium,Belgium,Belgium,Curacao
+60,Bermuda,Bermuda,Bermuda,Bermuda,Dominica
+64,Bhutan,Bhutan,Bhutan,Bhutan,Early-demographic dividend
+68,Bolivia,Bolivia,Bolivia,Bolivia,East Asia & Pacific
+70,Bosnia,,Bosnia and Herzegovina,Bosnia and Herzegovina,East Asia & Pacific (excluding high income)
+72,Botswana,Botswana,Botswana,Botswana,"Egypt, Arab Rep."
+76,Brazil,Brazil,Brazil,Brazil,Euro area
+84,Belize,Belize,Belize,Belize,Djibouti
+100,Bulgaria,Bulgaria,Bulgaria,Bulgaria,Europe & Central Asia
+104,Myanmar,,Myanmar,Myanmar,
+108,Burundi,Burundi,Burundi,Burundi,Europe & Central Asia (IDA & IBRD countries)
+112,Belarus,Belarus,Belarus,Belarus,"Congo, Dem. Rep."
+116,Cambodia,Cambodia,Cambodia,Cambodia,European Union
+120,Cameroon,Cameroon,Cameroon,Cameroon,Faroe Islands
+124,Canada,Canada,Canada,Canada,Fiji
+144,Sri Lanka,,Sri Lanka,Sri Lanka,
+148,Chad,Chad,Chad,Chad,Fragile and conflict affected situations
+152,Chile,Chile,Chile,Chile,French Polynesia
+156,China,China,China,China,Gabon
+158,Taiwan,,,Taiwan,
+170,Colombia,Colombia,Colombia,Colombia,Greenland
+180,D.R. Congo,,"Congo, Rep.","Congo, Rep.",IDA total
+184,Cook Islands,,,,Grenada
+188,Costa Rica,Costa Rica,Costa Rica,Costa Rica,Guam
+191,Croatia,Croatia,Croatia,Croatia,High income
+192,Cuba,Cuba,Cuba,Cuba,IBRD only
+196,Cyprus,Cyprus,Cyprus,Cyprus,IDA & IBRD total
+197,Cyprus (T),,,,IDA blend
+203,Czech Rep.,,Czech Republic,Czech Republic,IDA only
+208,Denmark,Denmark,Denmark,Denmark,Isle of Man
+214,Dominican Rep.,,Dominican Republic,Dominican Republic,Kiribati
+218,Ecuador,Ecuador,Ecuador,Ecuador,Late-demographic dividend
+222,El Salvador,El Salvador,El Salvador,El Salvador,Latin America & Caribbean (excluding high income)
+226,Eq.Guinea,,Equatorial Guinea,Equatorial Guinea,Latin America & the Caribbean (IDA & IBRD countries)
+231,Ethiopia,Ethiopia,Ethiopia,Ethiopia,Low income
+232,Eritrea,Eritrea,Eritrea,Eritrea,Least developed countries: UN classification
+233,Estonia,Estonia,Estonia,Estonia,Low & middle income
+246,Finland,Finland,Finland,Finland,Lower middle income
+250,France,France,France,France,"Macao SAR, China"
+268,Georgia,Georgia,Georgia,Georgia,"Micronesia, Fed. Sts."
+270,Gambia,,"Gambia, The","Gambia, The",Marshall Islands
+275,Palestine,,,Palestine,
+276,Germany,Germany,Germany,Germany,Middle East & North Africa
+288,Ghana,Ghana,Ghana,Ghana,Middle East & North Africa (excluding high income)
+292,Gibraltar,Gibraltar,Gibraltar,Gibraltar,Middle East & North Africa (IDA & IBRD countries)
+300,Greece,Greece,Greece,Greece,Nauru
+320,Guatemala,Guatemala,Guatemala,Guatemala,New Caledonia
+324,Guinea,,Guinea,Guinea,North America
+328,Guyana,,Guyana,Guyana,Not classified
+332,Haiti,,Haiti,Haiti,OECD members
+340,Honduras,,Honduras,Honduras,Other small states
+344,Hong Kong,,"Hong Kong SAR, China","Hong Kong SAR, China",Pacific island small states
+348,Hungary,,Hungary,Hungary,Palau
+352,Iceland,,Iceland,Iceland,Post-demographic dividend
+356,India,India,India,India,Pre-demographic dividend
+360,Indonesia,,Indonesia,Indonesia,Samoa
+364,Iran,,"Iran, Islamic Rep.","Iran, Islamic Rep.",San Marino
+368,Iraq,Iraq,Iraq,Iraq,Sao Tome and Principe
+372,Ireland,,Ireland,Ireland,Sint Maarten (Dutch part)
+376,Israel,,Israel,Israel,Small states
+380,Italy,,Italy,Italy,Solomon Islands
+384,Côte d'Ivoire,,Cote d'Ivoire,Cote d'Ivoire,Heavily indebted poor countries (HIPC)
+388,Jamaica,,Jamaica,Jamaica,South Asia
+392,Japan,Japan,Japan,Japan,South Asia (IDA & IBRD)
+398,Kazakhstan,Kazakhstan,Kazakhstan,Kazakhstan,St. Kitts and Nevis
+400,Jordan,Jordan,Jordan,Jordan,South Sudan
+404,Kenya,,Kenya,Kenya,St. Lucia
+408,North Korea,,"Korea, Rep.","Korea, Rep.",
+410,South Korea,,"Korea, Dem. People’s Rep.",South Korea,St. Martin (French part)
+414,Kuwait,Kuwait,Kuwait,Kuwait,Sub-Saharan Africa
+417,Kyrgyzstan,,Kyrgyz Republic,Kyrgyz Republic,Sub-Saharan Africa (excluding high income)
+418,Laos,,,,Sub-Saharan Africa (IDA & IBRD countries)
+422,Lebanon,Lebanon,Lebanon,Lebanon,Tonga
+426,Lesotho,,Lesotho,Lesotho,Turks and Caicos Islands
+428,Latvia,,Latvia,Latvia,Swaziland
+430,Liberia,,Liberia,Liberia,Tuvalu
+434,Libyan Arab Jamahiriya,,Libya,Libya,
+438,Liechtenstein,,Liechtenstein,Liechtenstein,Upper middle income
+440,Lithuania,,Lithuania,Lithuania,Vanuatu
+442,Luxembourg,,Luxembourg,Luxembourg,Virgin Islands (U.S.)
+450,Madagascar,,Madagascar,Madagascar,
+454,Malawi,,Malawi,Malawi,
+458,Malaysia,Malaysia,Malaysia,Malaysia,
+466,Mali,,Mali,Mali,
+470,Malta,,Malta,Malta,
+474,Martinique,,,,
+478,Mauritania,,Mauritania,Mauritania,
+480,Mauritius,,Mauritius,Mauritius,
+484,Mexico,Mexico,Mexico,Mexico,
+492,Monaco,,Monaco,Monaco,
+496,Mongolia,,Mongolia,Mongolia,
+498,Moldova,,Moldova,Moldova,
+504,Morocco,Morocco,Morocco,Morocco,
+508,Mozambique,,Mozambique,Mozambique,
+512,Oman,,Oman,Oman,
+516,Namibia,,Namibia,Namibia,
+524,Nepal,,Nepal,Nepal,
+528,Netherlands,Netherlands,Netherlands,Netherlands,
+554,New Zealand,New Zealand,New Zealand,New Zealand,
+558,Nicaragua,,Nicaragua,Nicaragua,
+562,Niger,,Niger,Niger,
+566,Nigeria,Nigeria,Nigeria,Nigeria,
+578,Norway,,Norway,Norway,
+586,Pakistan,Pakistan,Pakistan,Pakistan,
+591,Panama,,Panama,Panama,
+598,Papua New Guinea,,Papua New Guinea,Papua New Guinea,
+600,Paraguay,,Paraguay,Paraguay,
+604,Peru,Peru,Peru,Peru,
+608,Philippines,Philippines,Philippines,Philippines,
+616,Poland,Poland,Poland,Poland,
+620,Portugal,,Portugal,Portugal,
+624,Guinea-Bissau,,Guinea-Bissau,Guinea-Bissau,Northern Mariana Islands
+626,Timor-Leste,,Timor-Leste,Timor-Leste,
+630,Puerto Rico,,Puerto Rico,Puerto Rico,
+634,Qatar,Qatar,Qatar,Qatar,
+642,Romania,Romania,Romania,Romania,
+643,Russia,,Russian Federation,Russian Federation,
+646,Rwanda,Rwanda,Rwanda,Rwanda,
+682,Saudi Arabia,,Saudi Arabia,Saudi Arabia,
+686,Senegal,,Senegal,Senegal,
+690,Seychelles,,Seychelles,Seychelles,
+694,Sierra Leone,,Sierra Leone,Sierra Leone,
+702,Singapore,Singapore,Singapore,Singapore,
+703,Slovakia,,Slovak Republic,Slovak Republic,
+704,Viet Nam,,Vietnam,Vietnam,
+705,Slovenia,Slovenia,Slovenia,Slovenia,
+706,Somalia,,Somalia,Somalia,
+710,South Africa,South Africa,South Africa,South Africa,
+716,Zimbabwe,Zimbabwe,Zimbabwe,Zimbabwe,
+724,Spain,Spain,Spain,Spain,
+736,Sudan,,Sudan,Sudan,
+740,Suriname,,Suriname,Suriname,
+752,Sweden,Sweden,Sweden,Sweden,
+756,Switzerland,,Switzerland,Switzerland,
+760,Syria,,Syrian Arab Republic,Syrian Arab Republic,
+762,Tajikistan,,Tajikistan,Tajikistan,
+764,Thailand,Thailand,Thailand,Thailand,
+768,Togo,,Togo,Togo,
+780,Trinidad and Tobago,Trinidad and Tobago,Trinidad and Tobago,Trinidad and Tobago,
+784,United Arab Emirates,,United Arab Emirates,United Arab Emirates,
+788,Tunisia,Tunisia,Tunisia,Tunisia,
+792,Turkey,Turkey,Turkey,Turkey,
+795,Turkmenistan,,Turkmenistan,Turkmenistan,
+800,Uganda,,Uganda,Uganda,
+804,Ukraine,Ukraine,Ukraine,Ukraine,
+807,Macedonia,,"Macedonia, FYR","Macedonia, FYR",West Bank and Gaza
+818,"Egypt, Arab Rep.",,"Egypt, Arab Rep.","Egypt, Arab Rep.",Latin America & Caribbean
+826,Great Britain,,United Kingdom,United Kingdom,Middle income
+834,Tanzania,,Tanzania,,
+840,United States,United States,United States,United States,
+850,United States Virgin Islands,,,,
+854,Burkina Faso,Burkina Faso,Burkina Faso,Burkina Faso,Europe & Central Asia (excluding high income)
+858,Uruguay,Uruguay,Uruguay,Uruguay,
+860,Uzbekistan,Uzbekistan,Uzbekistan,Uzbekistan,
+862,Venezuela,,"Venezuela, RB","Venezuela, RB",
+887,Yemen,,"Yemen, Rep.","Yemen, Rep.",
+891,Serbia and Montenegro,,,,
+894,Zambia,,Zambia,Zambia,
+900,West Germany,,,,
+901,East Germany,,,,Lao PDR
+902,Tambov,,,,
+903,Moscow,,,,
+904,Basque Country,,,,Comoros
+906,Andalusia,,,,Aruba
+907,Galicia,,,,Maldives
+909,North Ireland,,,,
+910,Valencia,,,,
+911,Serbia,,Serbia,Serbia,
+912,Montenegro,,Montenegro,Montenegro,
+913,Srpska Republic,,,,
+914,Bosnian Federation,,,,East Asia & Pacific (IDA & IBRD countries)
+915,Kosovo,,Kosovo,Kosovo,St. Vincent and the Grenadines

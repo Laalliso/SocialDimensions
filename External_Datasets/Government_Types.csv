@@ -1,0 +1,57 @@
+Country.Code,Country.Title,Government,Government Type
+12,Algeria,Presidential Republic,Presidential
+32,Argentina,Presidential Republic,Presidential
+51,Armenia,Parliamentary Democracy,Parliamentary
+36,Australia,Parliamentary Democracy with Constitutional Monarchy,Parliamentary
+31,Azerbaijan,Presidential Republic,Presidential
+112,Belarus,Dictatorship,Dictatorship
+76,Brazil,Federal Presidential Republic,Presidential
+152,Chile,Presidential Republic,Presidential
+156,China,Communist,Dictatorship
+170,Colombia,Presidential Republic,Presidential
+196,Cyprus,Presidential Democracy,Presidential
+218,Ecuador,Presidential Republic,Presidential
+233,Estonia,Parliamentary Republic,Parliamentary
+268,Georgia,Semi Presidential Republic,Presidential
+276,Germany,Federal Parliamentry Republic,Parliamentary
+288,Ghana,Presidential Republic,Presidential
+344,"Hong Kong SAR, China",Presidential Democracy,Presidential
+356,India,Federal Parliamentry Republic,Parliamentary
+368,Iraq,Federal Parliamentry Republic,Parliamentary
+392,Japan,Parliamentary Consitutional Monarchy,Parliamentary
+400,Jordan,Parliamentary Consitutional Monarchy,Parliamentary
+398,Kazakhstan,Presidential Republic,Presidential
+410,"Korea, Dem. People's Rep.",Dictatorship,Dictatorship
+417,Kyrgyz Republic,Parliamentary Republic,Parliamentary
+422,Lebanon,Parliamentary Republic,Parliamentary
+434,Libya,Violent Transisition,Violent
+458,Malaysia,Federal Parliamentary Constitutional Monarchy,Parliamentary
+484,Mexico,Federal Presidential Republic,Presidential
+504,Morocco,Parliamentary Consitutional Monarchy,Parliamentary
+528,Netherlands,Parliamentary Consitutional Monarchy,Parliamentary
+554,New Zealand,Parliamentary Democracy with Constitutional Monarchy,Parliamentary
+566,Nigeria,Federal Presidential Republic,Presidential
+586,Pakistan,Federal Parliamentry Republic,Parliamentary
+275,Palestine,Dictatorship,Dictatorship
+604,Peru,Presidential Republic,Presidential
+608,Philippines,Presidential Republic,Presidential
+616,Poland,Parliamentary Republic,Parliamentary
+642,Romania,Semi Presidential Republic,Presidential
+643,Russian Federation,Semi Presidential Republic,Presidential
+646,Rwanda,Presidential Republic,Presidential
+702,Singapore,Parliamentary Republic,Parliamentary
+705,Slovenia,Parliamentary Republic,Parliamentary
+710,South Africa,Parliamentary Republic,Parliamentary
+724,Spain,Parliamentary Consitutional Monarchy,Parliamentary
+752,Sweden,Parliamentary Consitutional Monarchy,Parliamentary
+158,Taiwan,Presidential Republic,Parliamentary
+764,Thailand,Consitutional Monarchy,Parliamentary
+780,Trinidad and Tobago,Parliamentary Republic,Parliamentary
+788,Tunisia,Parliamentary Republic,Parliamentary
+792,Turkey,Parliamentary Republic,Parliamentary
+804,Ukraine,Semi Presidential Republic,Presidential
+840,United States,Consitutional Federal Republic,Presidential
+858,Uruguay,Presidential Republic,Presidential
+860,Uzbekistan,Presidential Republic,Presidential
+887,"Yemen, Rep.",Violent Transisition,Violent
+716,Zimbabwe,Semi Presidential Republic,Presidential

@@ -1,0 +1,79 @@
+ctr,Country,pdi,idv,mas,uai
+AUT,Austria,11,55,79,70
+ISR,Israel,13,54,47,81
+DEN,Denmark,18,74,16,23
+NZL,New Zealand,22,79,58,49
+SWG,Switzerland German,26,69,72,56
+IRE,Ireland,28,70,68,35
+NOR,Norway,31,69,8,50
+SWE,Sweden,31,71,5,29
+FIN,Finland,33,63,26,59
+SWI,Switzerland,34,68,70,58
+COS,Costa Rica,35,15,21,86
+GER,Germany,35,67,66,65
+GBR,Great Britain,35,89,66,35
+AUL,Australia,38,90,61,51
+NET,Netherlands,38,80,14,53
+CAN,Canada,39,80,52,48
+EST,Estonia,40,60,30,60
+LUX,Luxembourg,40,60,50,70
+USA,United States,40,91,62,46
+LIT,Lithuania,42,60,19,65
+LAT,Latvia,44,70,9,63
+JAM,Jamaica,45,39,68,13
+HUN,Hungary,46,80,88,82
+TRI,Trinidad and Tobago,47,16,58,55
+ARG,Argentina,49,46,56,86
+SAW,South Africa white,49,65,63,49
+ITA,Italy,50,76,70,75
+CAF,Canada French,54,73,45,60
+JPN,Japan,54,46,95,92
+PAK,Pakistan,55,14,50,70
+MLT,Malta,56,59,47,96
+CZE,Czech Rep,57,58,57,74
+SPA,Spain,57,51,42,86
+IRA,Iran,58,41,43,59
+TAI,Taiwan,58,17,45,69
+GRE,Greece,60,35,57,112
+KOR,Korea South,60,18,39,85
+BEN,Belgium Netherl,61,78,43,97
+URU,Uruguay,61,36,38,100
+CHL,Chile,63,23,28,86
+POR,Portugal,63,27,31,104
+AFE,Africa East,64,27,41,52
+PER,Peru,64,16,42,87
+THA,Thailand,64,20,34,64
+BEL,Belgium,65,75,54,94
+SAL,El Salvador,66,19,40,94
+TUR,Turkey,66,37,45,85
+BEF,Belgium French,67,72,60,93
+COL,Colombia,67,13,64,80
+FRA,France,68,71,43,86
+HOK,"Hong Kong SAR, China",68,25,57,29
+POL,Poland,68,60,64,93
+BRA,Brazil,69,38,49,76
+BUL,Bulgaria,70,30,40,85
+MOR,Morocco,70,46,53,68
+SWF,Switzerland French,70,64,58,70
+VIE,Vietnam,70,20,40,30
+SLV,Slovenia,71,27,19,88
+CRO,Croatia,73,33,40,80
+SIN,Singapore,74,20,48,8
+AFW,Africa West,77,20,46,54
+IND,India,77,48,56,40
+ECA,Ecuador,78,8,63,67
+IDO,Indonesia,78,14,46,48
+ARA,Arab countries,80,38,53,68
+BAN,Bangladesh,80,20,55,60
+CHI,China,80,20,66,30
+MEX,Mexico,81,30,69,82
+VEN,Venezuela,81,12,73,76
+SUR,Suriname,85,47,37,92
+SER,Serbia,86,25,43,92
+ROM,Romania,90,30,42,90
+RUS,Russian Federation,93,39,36,95
+PHI,Philippines,94,32,64,44
+GUA,Guatemala,95,6,37,101
+PAN,Panama,95,11,44,86
+MAL,Malaysia,104,26,50,36
+SLK,Slovak Rep,104,52,110,51

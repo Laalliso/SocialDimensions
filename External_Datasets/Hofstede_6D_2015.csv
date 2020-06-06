@@ -1,0 +1,112 @@
+ctr,Country,pdi,idv,mas,uai,ltowvs,ivr
+PUE,Puerto Rico,NA,NA,NA,NA,0,90
+GHA,Ghana,NA,NA,NA,NA,4,72
+EGY,Egypt,NA,NA,NA,NA,7,4
+AFW,Africa West,77,20,46,54,9,78
+COL,Colombia,67,13,64,80,13,83
+DOM,Dominican Rep,NA,NA,NA,NA,13,54
+NIG,Nigeria,NA,NA,NA,NA,13,84
+TRI,Trinidad and Tobago,47,16,58,55,13,80
+IRA,Iran,58,41,43,59,14,40
+MOR,Morocco,70,46,53,68,14,25
+ZIM,Zimbabwe,NA,NA,NA,NA,15,28
+JOR,Jordan,NA,NA,NA,NA,16,43
+VEN,Venezuela,81,12,73,76,16,100
+RWA,Rwanda,NA,NA,NA,NA,18,37
+ARG,Argentina,49,46,56,86,20,62
+SAL,El Salvador,66,19,40,94,20,89
+MLI,Mali,NA,NA,NA,NA,20,43
+AUL,Australia,38,90,61,51,21,71
+ARA,Arab countries,80,38,53,68,23,34
+IRE,Ireland,28,70,68,35,24,65
+MEX,Mexico,81,30,69,82,24,97
+UGA,Uganda,NA,NA,NA,NA,24,52
+IRQ,Iraq,NA,NA,NA,NA,25,17
+PER,Peru,64,16,42,87,25,46
+ALG,Algeria,NA,NA,NA,NA,26,32
+USA,United States,40,91,62,46,26,68
+URU,Uruguay,61,36,38,100,26,53
+BUF,Burkina Faso,NA,NA,NA,NA,27,18
+PHI,Philippines,94,32,64,44,27,42
+ICE,Iceland,NA,NA,NA,NA,28,67
+POR,Portugal,63,27,31,104,28,33
+ZAM,Zambia,NA,NA,NA,NA,30,42
+CHL,Chile,63,23,28,86,31,68
+AFE,Africa East,64,27,41,52,32,40
+THA,Thailand,64,20,34,64,32,45
+NZL,New Zealand,22,79,58,49,33,75
+SAF,South Africa,NA,NA,NA,NA,34,63
+TAN,Tanzania,NA,NA,NA,NA,34,38
+DEN,Denmark,18,74,16,23,35,70
+NOR,Norway,31,69,8,50,35,55
+CAN,Canada,39,80,52,48,36,68
+SAU,Saudi Arabia,NA,NA,NA,NA,36,52
+FIN,Finland,33,63,26,59,38,57
+GEO,Georgia,NA,NA,NA,NA,38,32
+ISR,Israel,13,54,47,81,38,NA
+POL,Poland,68,60,64,93,38,29
+MAL,Malaysia,104,26,50,36,41,57
+BRA,Brazil,69,38,49,76,44,59
+GRE,Greece,60,35,57,112,45,50
+TUR,Turkey,66,37,45,85,46,49
+BAN,Bangladesh,80,20,55,60,47,20
+MLT,Malta,56,59,47,96,47,66
+SPA,Spain,57,51,42,86,48,44
+SLV,Slovenia,71,27,19,88,49,48
+PAK,Pakistan,55,14,50,70,50,0
+GBR,Great Britain,35,89,66,35,51,69
+IND,India,77,48,56,40,51,26
+ROM,Romania,90,30,42,90,52,20
+SER,Serbia,86,25,43,92,52,28
+SWE,Sweden,31,71,5,29,53,78
+VIE,Vietnam,70,20,40,30,57,35
+CRO,Croatia,73,33,40,80,58,33
+HUN,Hungary,46,80,88,82,58,31
+AUT,Austria,11,55,79,70,60,63
+ALB,Albania,NA,NA,NA,NA,61,15
+ARM,Armenia,NA,NA,NA,NA,61,NA
+AZE,Azerbaijan,NA,NA,NA,NA,61,22
+HOK,"Hong Kong SAR, China",68,25,57,29,61,17
+ITA,Italy,50,76,70,75,61,30
+IDO,Indonesia,78,14,46,48,62,38
+MAC,Macedonia Rep,NA,NA,NA,NA,62,35
+FRA,France,68,71,43,86,63,48
+LUX,Luxembourg,40,60,50,70,64,56
+KYR,Kyrgyz Republic,NA,NA,NA,NA,66,39
+NET,Netherlands,38,80,14,53,67,68
+BUL,Bulgaria,70,30,40,85,69,16
+LAT,Latvia,44,70,9,63,69,13
+BOS,Bosnia,NA,NA,NA,NA,70,44
+CZE,Czech Rep,57,58,57,74,70,29
+MOL,Moldova,NA,NA,NA,NA,71,19
+SIN,Singapore,74,20,48,8,72,46
+SWI,Switzerland,34,68,70,58,74,66
+MNG,Montenegro,NA,NA,NA,NA,75,20
+SLK,Slovak Rep,104,52,110,51,77,28
+GEE,Germany East,NA,NA,NA,NA,78,34
+BLR,Belarus,NA,NA,NA,NA,81,15
+RUS,Russian Federation,93,39,36,95,81,20
+BEL,Belgium,65,75,54,94,82,57
+EST,Estonia,40,60,30,60,82,16
+LIT,Lithuania,42,60,19,65,82,16
+GER,Germany,35,67,66,65,83,40
+UKR,Ukraine,NA,NA,NA,NA,86,14
+CHI,China,80,20,66,30,87,24
+JPN,Japan,54,46,95,92,88,42
+TAI,Taiwan,58,17,45,69,93,49
+KOR,South Korea,60,18,39,85,100,29
+AND,Andorra,NA,NA,NA,NA,NA,65
+BEF,Belgium French,67,72,60,93,NA,NA
+BEN,Belgium Netherl,61,78,43,97,NA,NA
+CAF,Canada French,54,73,45,60,NA,NA
+COS,Costa Rica,35,15,21,86,NA,NA
+CYP,Cyprus,NA,NA,NA,NA,NA,70
+ECA,Ecuador,78,8,63,67,NA,NA
+ETH,Ethiopia,NA,NA,NA,NA,NA,46
+GUA,Guatemala,95,6,37,101,NA,NA
+JAM,Jamaica,45,39,68,13,NA,NA
+PAN,Panama,95,11,44,86,NA,NA
+SAW,South Africa white,49,65,63,49,NA,NA
+SUR,Suriname,85,47,37,92,NA,NA
+SWF,Switzerland French,70,64,58,70,NA,NA
+SWG,Switzerland German,26,69,72,56,NA,NA

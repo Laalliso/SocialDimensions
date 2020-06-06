@@ -1,0 +1,131 @@
+---
+title: "05b_Grouped_MIRT_Outputs"
+author: "Leigh Allison"
+date: "July 13, 2018"
+output: html_document
+---
+Set working directory to where output files from 05a_Grouped_MIRT_Analysis are saved.
+```{r}
+#setwd("C:/Users/laalliso/Dropbox (Graduate Research)/02 General Exam/FormatCode")
+```
+
+##Variable Interpretation
+```{r Adding Variable Interpretation}
+#Add variable descriptions to the varaibles in Mean/median data frame.
+Descriptions <- read.csv("Codebook_Formatted.csv")
+rownames(Descriptions) <- Descriptions$VAR
+
+#Individual_MIRTData <- read.csv("Individual_MIRTData_Converted_AutoCombine_NBOMod.csv")
+Individual_MIRTData <- read.csv("Individual_MIRTData_NBO198.csv")
+
+#Individual_MIRTData <- read.csv("World_Individual_MIRTData.csv")
+
+#subset the variables to the ones that are used
+#InglehartVariables <- c("V21","V204","V211","V69","V61","V10","V85","V203","V24")
+#Individual_MIRTData<- Individual_MIRTData[,c("V2.x","V258.x",InglehartVariables)]
+
+m=198  #number of variables
+r=m+4  #number of columns in dataframe
+
+#from Hyak all the variables should be used
+Codebook_AddDescriptions<- Descriptions[c(colnames(Individual_MIRTData[c(5:r)])),]
+```
+
+```{r Add item type}
+itemT <- rep('graded', 198) #Ordered 
+itemT[1:11] <- '2PL' #Categorical, but reduced to binary
+itemT[12:22] <- 'nominal' 
+itemT[19] <- '2PL' #Categorical, but reduced to binary
+itemT[21] <- '2PL' #Categorical, but reduced to binary
+itemT[22] <- '2PL' #Categorical, but reduced to binary
+itemT[23:52] <- '2PL' #Binary
+
+
+Items <- as.data.frame(itemT)
+
+#World_itemtype <- read.csv("World_Individual_MirtData_Itemtype.csv")
+#Items <- World_itemtype$itemT
+
+```
+
+```{r Min and Max Code Used per Question}
+#find the range of codes used for each question
+min.code <- function(aCol) {
+  min(aCol, na.rm = TRUE)
+}
+
+max.code <- function(aCol) {
+  max(aCol, na.rm = TRUE)
+}
+
+Minimum_Code <- as.data.frame(apply(Individual_MIRTData[,c(3:r)], 2, min.code))
+Maximum_Code <- as.data.frame(apply(Individual_MIRTData[,c(3:r)], 2, max.code))
+
+Min_Max <- cbind(Minimum_Code, Maximum_Code)
+colnames(Min_Max) <- c("Minimum", "Maximum")
+```
+
+```{r Combine min max and item type}
+#Mergeing by variable names - need to check that all are the same.
+Codebook_AddDescriptions<- merge(Codebook_AddDescriptions, Min_Max, 
+                                 by.x = 0, by.y=0, all.x=TRUE, sort = FALSE)
+
+Codebook_AddDescriptions<- cbind(Codebook_AddDescriptions, Items)
+```
+
+
+##Hyak Outputs
+From hyak, several csv files will be created for the loadings and communalities for each country and scores for every individual. The loadings and communalities will be equal if the variance was restricted to one in the mirt model. We need to combine the loadings and communalities and then add the descriptions, answer categories, minimum and maximum values used, how the variable was models (2PL, NRM, Binary) and coeficients (which should also be equal for all the countries in both model types)
+
+```{r Add coefcients}
+#All the countries should have the same coef but will double check
+#load("") #load the final CFA model - 
+
+Coef_Model <- coef(Transformed_Model)
+Coef_Names <-  paste("Coef", names(Coef_Model), sep = "_")
+LatentMV_Names <- names(Coef_Model)
+Latent_MV_All <- c()
+
+i=1
+j=1
+n=56 #number of countries
+m=55 #number of variables
+v=m+1 #row of mean and variances for each latent trait
+
+for(i in 1:n){#loops through the countries
+  Country_Coef <- Coef_Model[[i]] #focuses on one country
+  #this data frame will be used to store the coefficients
+  Variables_Coef_All <- c()
+  for(j in 1:m){#loop through all variables
+    Variables_Coef <- as.data.frame(do.call(rbind.data.frame, Country_Coef[j]))
+    Variables_Coef_All <- rbind.fill(Variables_Coef_All, Variables_Coef)
+    j=j+1
+    }
+    Latent_MeanVar <- as.data.frame(do.call(rbind.data.frame, Country_Coef[v]))
+    Latent_MV_All <- rbind(Latent_MV_All,Latent_MeanVar)
+    
+  rownames(Variables_Coef_All)<- names(Country_Coef[c(1:m)])
+  assign(Coef_Names[i], as.data.frame(Variables_Coef_All))
+  filename=paste(Coef_Names[i],".csv",sep="")
+  #write.csv(Variables_Coef_All, filename)
+  i=i+1
+}
+
+rownames(Latent_MV_All)<- LatentMV_Names
+summary (Coef_112==Coef_218)
+
+Descriptions_Coef<- merge(Codebook_AddDescriptions, Coef_218, by.x="VAR", by.y = 0)
+```
+
+```{r Add CFA loadings}
+#merge with CFA loadings 
+CFA_Loadings <- read.csv("CFA_Loadings_NC3O_Transformed.csv")
+LoadingVariableDescriptions <- merge(Descriptions_Coef,
+                                      CFA_Loadings, 
+                                       by.x="VAR", by.y="X")
+```
+
+```{r Intrepretation of Variables}
+#now need to add themes to this dataframe (theme interpretation is dependent on how the variable loads onto the factor)
+write.csv(LoadingVariableDescriptions,"Final_5F_CFA_NC30_Descriptions.csv")
+```

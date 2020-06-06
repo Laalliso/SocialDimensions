@@ -1,0 +1,437 @@
+---
+title: "Subsetting WVS"
+author: "Leigh Allison"
+date: "April 4, 2017"
+output: html_document
+---
+This data set is available at http://www.worldvaluessurvey.org/WVSDocumentationWV6.jsp. For our analysis, download and then load the file into the R workspace with the following code:
+```{r}
+setwd("~/GitHub/WVS_Analysis_2018")
+load("~/GitHub/WVS_Analysis_2018/WV6_Data_R_v_2016_01_01.rdata")
+
+#Data updated in 09/2018
+Wave6_Update <- readRDS("F00007762-WV6_Data_R_v20180912.rds")
+```
+
+It will take a mintue to load this data set. It is quite large. 
+Then we save the data as a dataframe in R
+```{r}
+Wave6 <- WV6_Data_R
+```
+
+Now, we are going to subset the questions into nine themes that were established in the WVS Codebook. We will further subset those sets into categorical and ordinal questions.  As will be described later in the analysis, we analyze ordinal and categorical variables slightly differently. All of our data comes from Wave 6 currently.
+
+#Preceptions of Family Life (PFL)
+```{r}
+PFL_Wave6 <- Wave6[ , c("V2", #country code
+                       "V258", #respondant weight
+                       "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18",
+                       "V19", "V20", "V21", "V22", "V25", "V26", "V27", "V28", "V29", "V30", "V31", "V32", "V33", "V34",
+                       "V35", "V37", "V42", "V39", "V38", "V36", "V40", "V41", "V43", "V44", "V24", "V56_NZ", "V56", 
+                       "V23", "V55", "V70", "V71","V72", "V73", "V74B", "V75", "V76", "V77", "V78", "V79", "V74", "V157", 
+                       "V158", "V159", "V160", "V161", "V162", "V163", "V164", "V165", "V166", "V167", "V168", "V169", 
+                       "V160A", "V160B", "V160C", "V160D", "V160E", "V160F", "V160G", "V160H", "V160I", "V160J" )]
+write.csv(PFL_Wave6, "PFL_Raw_Data.csv")
+
+Categorical_subset <- PFL_Wave6[,c("V2","V258","V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12", "V13", "V14","V15",
+                                   "V16", "V17", "V18", "V19", "V20", "V21", "V22", "V25", "V26", "V27", "V28", "V29", 
+                                   "V30", "V31", "V32", "V33", "V34", "V35", "V37", "V42", "V39", "V38", "V36", "V40", 
+                                   "V41", "V43", "V44", "V24", "V70", "V71","V72", "V73", "V74B", "V75", "V76", "V77", 
+                                   "V78", "V79", "V74","V165", "V166", "V167", "V168", "V169", 
+                                   "V160A", "V160B", "V160C", "V160D", "V160E", "V160F", "V160G", "V160H", "V160I", 
+                                   "V160J" )] 
+
+
+Ordinal_subset <- PFL_Wave6[,c("V2", "V258", "V23", "V56_NZ", "V56","V55","V157", "V158", "V159", "V160","V164")]
+Ordinal_subset_5scale <- PFL_Wave6[,c("V161", "V162", "V163")]
+```
+
+###Visualize Raw data
+Let's look at histograms to see what the most popular responses are...if there are any -4 or -3 in the variable, it should be removed from the analysis. I divided the histograms into categorical and ordinal for clarity.
+
+Categorical Raw Data- 69 Variables
+```{r PFL Categorical Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+for(i in c(3:68)){
+  hist(Categorical_subset[,i], main = names(Categorical_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+Ordinal Raw Data - 9 Variables
+```{r PFL Ordinal Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+
+for(i in c(3:9)){
+  hist(Ordinal_subset[,i], main = names(Ordinal_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+```{r Write PFL Files}
+PFL_Categorical_subset <- Categorical_subset
+write.csv(PFL_Categorical_subset, "PFL_Categorical_subset.csv")
+
+PFL_Ordinal_Subset <- Ordinal_subset
+write.csv(PFL_Ordinal_Subset, "PFL_Ordinal_subset.csv")
+
+PFL_5Ordinal_Subset <- Ordinal_subset_5scale
+write.csv(PFL_5Ordinal_Subset, "PFL_5Ordinal_subset.csv")
+```
+
+#Environment
+```{r}
+Enviro_Wave6 <- Wave6[ , c("V2", #country code
+                       "V258", #respondant weight
+                       "V81", "V82" , "V83")]
+write.csv(Enviro_Wave6, "Enviro_Raw_Data.csv")
+
+Categorical_subset <- Enviro_Wave6[,c("V2","V258","V81", "V82" , "V83")] 
+
+Enviro_Categorical_subset <- Categorical_subset
+write.csv(Enviro_Categorical_subset, "Enviro_Categorical_Subset.csv")
+
+#No questions in environmental were ordinal
+```
+
+###Visualize Raw data
+Categorical Raw Data - 3 Variables
+```{r Enviro Categorical Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+for(i in c(3:5)){
+  hist(Categorical_subset[,i], main = names(Categorical_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+#Work
+```{r}
+Work_Wave6 <- Wave6[ , c("V2", #country code
+                       "V258", #respondant weight
+                       "V45", "V46", "V59")]
+write.csv(Work_Wave6, "Work_Raw_Data.csv")
+
+Categorical_subset <- Work_Wave6[,c("V2","V258","V45", "V46")] 
+Work_Categorical_subset <- Categorical_subset
+write.csv(Work_Categorical_subset, "Work_Categorical_subset.csv")
+
+Ordinal_subset <-Work_Wave6[,c("V2","V258","V59")]
+Work_Ordinal_subset <-Ordinal_subset
+write.csv(Work_Ordinal_subset, "Work_Ordinal_subset.csv")
+```
+
+###Visualize Raw data
+Categorical Raw Data- 3 Variables
+```{r Work Categorical Data Graphs}
+par(mfrow = c(1,3), mar = c(1., 1, 1.25, 1.25))
+for(i in c(3:4)){
+  hist(Categorical_subset[,i], main = names(Categorical_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+Ordinal Raw Data - 1 Variables
+```{r Work Ordinal Data Graphs}
+
+for(i in c(3:3)){
+  hist(Ordinal_subset[,i], main = names(Ordinal_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+All questions in Work were answered by the majority of respondants so none were removed. 
+
+#Family 
+```{r}
+Fam_Wave6 <- Wave6[ , c("V2", #country code
+                       "V258", #respondant weight
+                       "V102", "V49", "V54", "V51", "V52", "V50", "V48", "V47", "V53")]
+write.csv(Fam_Wave6, "Fam_Raw_Data.csv")
+
+Categorical_subset <- Fam_Wave6[,c("V2","V258","V102", "V49", "V54", "V51", "V52", "V50", "V48", "V47", "V53")] 
+Fam_Categorical_subset <- Categorical_subset
+write.csv(Fam_Categorical_subset, "Fam_Categorical_subset.csv")
+
+#No ordinal questions in Family 
+```
+
+###Visualize Raw data
+Categorical Raw Data- 9 Variables
+```{r Family Categorical Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+for(i in c(3:11)){
+  hist(Categorical_subset[,i], main = names(Categorical_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+
+#Politics and Society Questions
+```{r}
+PS_Wave6<- Wave6[ ,c("V2", #country code
+                     "V258", #respondant weight
+                    "V60", "V61", "V62", "V63", "V64", "V65", "V66", "V67", "V68", "V69",
+                    "V80", "V84", "V85", "V86", "V87" , "V88" , "V89",
+                    "V90", "V91", "V92", "V93", "V94", "V95", "V96", "V97", "V98", "V99", 
+                    "V100", "V101", "V108", "V109", "V110",
+                    "V111", "V112", "V113", "V114", "V115", 
+                    "V116", "V117", "V118", "V119","V120",
+                    "V121", "V122", "V123",  "V124", "V126", 
+                    "V127", "V128", "V129", 
+                    "V130", "V131", "V132", "V133", "V134", "V135", "V136", "V137","V138",
+                    "V140","V141", "V142", 
+                    "V192", "V193", "V194", "V197",
+                    "V225", "V226", "V227")]
+PS_Wave6_125 <-Wave6[, c("V125_15", "V125_09", "V125_00", "V125_08", "V125_05", "V125_06", "V125_12",
+                        "V125_01", "V125_14", "V125_02", "V125_07", "V125_10", "V125_04", "V125_11",
+                        "V125_13", "V125_03", "V125_16", "V125_17" )]
+PS_Wave_22XX <-Wave6[, c("V228_2", "V228", "V217_ESMA", "V217", "V218_ESMA", "V218", "V223", "V224_ESMA",
+                         "V224", "V219", "V219_ESMA", "V220_ESMA", "V220", "V221_ESMA", "V221",
+                         "V222_ESMA", "V222", "V228A", "V228B", "V228C","V228D","V228E","V228F",
+                         "V228G", "V228H", "V228I",  "V228J","V228K")]
+
+PS_Wave6 <- cbind(PS_Wave6, PS_Wave6_125, PS_Wave_22XX)
+write.csv(PS_Wave6,"PS_Raw_Data.csv")
+
+#125 not included because the question was changed for each country
+
+Categorical_subset <- PS_Wave6[,c("V2", "V258",
+                                  "V60", "V61", "V62", "V63", "V64", "V65", "V66", "V67", "V68", "V69",
+                                  "V80", "V84", "V85", "V86", "V87" , "V88" , "V89","V90", "V91", "V92", "V93", "V94",
+                                  "V108", "V109", "V110", "V111", "V112", "V113", "V114", "V115", "V116", "V117", 
+                                  "V118", "V119","V120", "V121", "V122", "V123",  "V124", "V126", "V127", "V128",
+                                  "V129", "V130", "V142", "V225", "V226", "V227",
+                                  "V228_2", "V228", "V217_ESMA", "V217", "V218_ESMA", "V218", "V223", "V224_ESMA",
+                                  "V224", "V219", "V219_ESMA", "V220_ESMA", "V220", "V221_ESMA", "V221",
+                                  "V222_ESMA", "V222", "V228A", "V228B", "V228C","V228D","V228E","V228F",
+                                  "V228G", "V228H", "V228I",  "V228J","V228K")] 
+
+
+Ordinal_subset <- PS_Wave6[,c("V2","V258","V95", "V96", "V97", "V98", "V99", 
+                    "V100", "V101", 
+                    "V131", "V132", "V133", "V134", "V135", "V136", "V137","V138",
+                    "V140","V141", "V192", "V193", "V194", "V197")]
+```
+
+###Visualize Raw data
+Categorical Raw Data- 62 Variables
+```{r PS Categorical Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+for(i in c(3:78)){
+  hist(Categorical_subset[,i], main = names(Categorical_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+Ordinal Raw Data - 21 Variables
+```{r PS Ordinal Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+
+for(i in c(3:23)){
+  hist(Ordinal_subset[,i], main = names(Ordinal_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+
+```{r Write PS Categorical and Ordinal Data Files}
+PS_Categorical_subset <- Categorical_subset
+write.csv(PS_Categorical_subset, "PS_Categorical_subset.csv")
+
+PS_Ordinal_subset <-Ordinal_subset
+write.csv(PS_Ordinal_subset, "PS_Ordinal_subset.csv")
+```
+
+
+#Religion and Morale
+```{r}
+RM_Wave6 <- Wave6[ , c("V2", #country code
+                       "V258", #respondant weight
+                       "V143", "V144", "V145", "V146", "V147", "V148", "V149", "V152", "V198", "V200", "V209", "V210", 
+                       "V199", "V201", "V202", "V203", "V203A", "V204", "V205", "V207A", "V207", "V206", "V208", "V150",
+                       "V151", "V153", "V154", "V155", "V156")]
+
+write.csv(RM_Wave6, "RM_Raw_Data.csv")
+
+Categorical_subset <- RM_Wave6[,c("V2","V258", "V143", "V144", "V145", "V146", "V147", "V148", "V149", "V150",
+                                  "V151", "V153", "V154", "V155", "V156")] 
+
+Ordinal_subset <- RM_Wave6[,c("V2","V258","V152", "V198", "V200", "V209", "V210", 
+                              "V199", "V201", "V202", "V203", "V203A", "V204", "V205", 
+                              "V207A", "V207", "V206", "V208")] 
+```
+
+###Visualize Raw data
+Categorical Raw Data- 13 Variables
+```{r RM Categorical Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+for(i in c(3:15)){
+  hist(Categorical_subset[,i], main = names(Categorical_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+Ordinal Raw Data - 16 Variables
+```{r RM Ordinal Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+
+for(i in c(3:18)){
+  hist(Ordinal_subset[,i], main = names(Ordinal_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+```{r Write RM Data files}
+RM_Categorical_subset <- Categorical_subset
+write.csv(RM_Categorical_subset, "RM_Categorical_subset.csv")
+
+RM_Ordinal_Subset <- Ordinal_subset
+write.csv(RM_Ordinal_Subset, "RM_Ordinal_subset.csv")
+```
+
+
+#National Identity 
+```{r}
+Nation_Wave6 <- Wave6[ , c("V2", #country code
+                       "V258", #respondant weight
+                       "V211", "V103", "V104", "V105", "V106", "V107", "V247", "V212", "V213", "V214", "V215_08", "V215_07",
+                       "V215_01", "V215_02", "V215_14", "V215_10", "V215_11", "V215_04", "V215_12", "V215_05", "V215_13",
+                       "V215_06", "V215_03", "V215_15", "V215_16", "V215_17", "V215_18", "V216", "V243", "V243_AU",
+                       "V244", "V244_AU", "V245", "V246")]
+write.csv(Nation_Wave6, "Nation_Raw_Data.csv")
+
+Categorical_subset <- Nation_Wave6[,c("V2","V258","V211", "V103", "V104", "V105", "V106", "V107", "V247", "V212", "V213",
+                                  "V214",
+                                  "V215_08", "V215_07", "V215_01", "V215_02", "V215_14", "V215_10", "V215_11", "V215_04",
+                                  "V215_12", "V215_05", "V215_13", "V215_06", "V215_03", "V215_15", "V215_16", "V215_17",
+                                  "V215_18", "V216", "V243", "V243_AU", "V244", "V244_AU", "V245", "V246")] 
+```
+
+##Visualize Raw data
+Categorical Raw Data- 34 Variables
+```{r Nation Categorical Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+for(i in c(3:36)){
+  hist(Categorical_subset[,i], main = names(Categorical_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+```{r Write Nation Data files}
+Nation_Categorical_subset <- Categorical_subset
+write.csv(Nation_Categorical_subset, "Nation_Categorical_subset.csv")
+```
+
+#Security
+```{r}
+Security_Wave6 <- Wave6[ , c("V2", #country code
+                             "V258", #respondant weight
+                             "V170", "V171", "V172", "V173", "V174", "V175", "V176", "V177", "V178", "V179"
+                             ,"V180", "V181", "V182", "V183", "V184", "V185", "V186", "V187", "V188", "V189"
+                             ,"V190", "V191")]
+write.csv(Security_Wave6, "Security_Raw_Data.csv")
+
+Categorical_subset <- Security_Wave6[,c("V2","V258", "V170", "V171", "V172", "V173", "V174", "V175", "V176", 
+                                        "V177", "V178", "V179" ,"V180", "V181", "V182", "V183", "V184", 
+                                        "V185", "V186", "V187", "V188", "V189", "V190", "V191")] 
+Security_Categorical_subset <- Categorical_subset
+write.csv(Security_Categorical_subset, "Security_Categorical_subset.csv")
+
+```
+
+##Visualize Raw data
+Categorical Raw Data- 22 Variables
+```{r Security Categorical Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+for(i in c(3:24)){
+  hist(Categorical_subset[,i], main = names(Categorical_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+#Science
+```{r}
+Science_Wave6 <- Wave6[ , c("V2", #country code
+                       "V258", #respondant weight
+                       "V195", "V196")]
+write.csv(Science_Wave6, "Science_Raw_Data.csv")
+
+Ordinal_subset <- Science_Wave6[,c("V2","V258", "V195", "V196")] 
+Science_Ordinal_Subset <- Ordinal_subset
+write.csv(Science_Ordinal_Subset, "Science_Ordinal_subset.csv")
+```
+
+Ordinal Raw Data - 2 Variables
+```{r Science Ordinal Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+
+for(i in c(3:4)){
+  hist(Ordinal_subset[,i], main = names(Ordinal_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+#Socio-Demographic
+```{r}
+SD_Wave6 <- Wave6[ , c("V2", #country code
+                       "V258", #respondant weight
+                       "V57", "V58", "V229", "V230", "V231", "V232", "V233", "V234", "V235", "V236", "V237", "V238", "V239",
+                       "V240", "V241", "V242", "V248", "V249", "V250", "V253", "V254", "V255", "V256")]
+write.csv(SD_Wave6, "SD_Raw_Data.csv")
+
+Categorical_subset <- SD_Wave6[,c("V2","V258", "V57", "V58", "V229", "V230", "V234", "V235", "V236", "V237", "V238",
+                                  "V240",  "V248", "V250", "V253", "V254", "V255", "V256")] 
+SD_Categorical_subset <- Categorical_subset
+write.csv(SD_Categorical_subset, "SD_Categorical_subset.csv")
+
+Ordinal_subset <- SD_Wave6[,c("V2","V258", "V231", "V232", "V233", "V239")] 
+SD_Ordinal_Subset <- Ordinal_subset
+write.csv(SD_Ordinal_Subset, "SD_Ordinal_subset.csv")
+
+Free_Response_subset <- SD_Wave6[,c("V2", "V258", "V241", "V242", "V249")]
+write.csv(Free_Response_subset, "FR_subset.csv")
+```
+
+##Visualize Raw data
+Categorical Raw Data- 16 Variables
+```{r SD Categorical Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+for(i in c(3:17)){
+  hist(Categorical_subset[,i], main = names(Categorical_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+Ordinal Raw Data - 4 Variables
+```{r SD Ordinal Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+
+for(i in c(3:6)){
+  hist(Ordinal_subset[,i], main = names(Ordinal_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```
+
+Free Response Raw Data - 3 Variables
+```{r SD Free Response Data Graphs}
+par(mfrow = c(3,3), mar = c(1., 1, 1.25, 1.25))
+
+for(i in c(3:5)){
+  hist(Free_Response_subset[,i], main = names(Free_Response_subset)[i], 
+                       xlab = "", ylab = "",
+                       cex.main = .9, cex.axis = .7, mgp=c(0.25,0.25,0))
+}
+```

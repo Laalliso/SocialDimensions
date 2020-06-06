@@ -1,0 +1,609 @@
+---
+title: "04_Centeral_Tendency_MIRT"
+author: "Leigh Allison"
+date: "August 24, 2018"
+output: html_document
+---
+
+#MIRT Analysis of Central Tendency Variables
+Now that we have the median for the ordered data and the mode for the unordered data, we can run a MIRT using this information. We need speficiy the ordered variables to use the graded model and the unordered data to use the nominal model. First, let's merge them into one dataframe and then run an item response analysis with graded for the ordered data and nominal for the unordered data.
+
+```{r}
+library(stats4)
+library(lattice)
+library(mirt)
+
+options(max.print=999999)
+```
+
+```{r}
+Central_Tendency_Data <- read.csv("Imputed_Mode_Median_Data.csv")
+Central_Tendency_Data <- Central_Tendency_Data[,c(2:190)]
+```
+
+#Frequency Table of Central Tendency Variables
+Let's look at the distributions of the modes and medians by question. The histograms and other plots were done in excel.
+```{r Mode and Median Frequency}
+freq=table(col(Central_Tendency_Data), as.matrix(Central_Tendency_Data))
+Names=colnames(Central_Tendency_Data)  # create list of names
+data=data.frame(cbind(freq),Names)   # combine them into a data frame
+data=data[,c(12,1,2,3,4,5,6,7,8,9,10,11)] # sort columns
+write.csv(data, "Frequency_Central_Tendency_Data.csv")
+```
+
+```{r ItemType}
+#Not all the variables have retained all the available response options. In other words, when the data was aggregated, not all the response options were used for all the questions. Therefore the model can be run using the question types as they were written or adapt the question types to recognize that not all the responses are used. Another consideration is that ordered questions should show increasing values in the coefficients if they are modeled with the graduated partial credit model. If that is not the case they can be modelled as a nominal question. 
+
+#Option 1 - Define item type by how the question was written. They are in a different order than the individual questions. All response which have an ordered are categorized at gpcm; the number of responses is not relevant in this situation.
+
+itemT <- rep('graded', 189) #Ordered 
+itemT[154:164] <- 'nominal' #Categorical
+itemT[165:189] <- '2PL' #Binary
+
+#Need to add updated item type for V12 inorder for this one to work
+#Threeitemtype <- read.csv("Itemtype.csv")
+#itemT<-as.character(Threeitemtype$Model.Required)
+```
+
+
+
+##Five Factor Model
+```{r MIRT 5F, warning=FALSE}
+sink("Central_Tendency_5F.txt")
+timestamp <- format(Sys.time(), "%m%d%Y_%H%M%S") 
+modelname <-"Central_Tendency_5F_MCEM"
+cat(modelname)
+
+timestamp
+#~~~~~~~~~~~~~~~~~~~~MCEM~~~~~~~~~~~~~~~~~~
+#Monte Carlo EM estimation - this samples from the 54 countries multiple times in order to reduce the demand on the E and M steps. 
+MIRT_Mode_Median_FiveFactor_MCEM<- mirt(Central_Tendency_Data, 5, itemtype=itemT, method = "MCEM", 
+                                        technical = list(NCYCLES=2000))
+MIRT_Mode_Median_FiveFactor_MCEM_Summary <- summary(MIRT_Mode_Median_FiveFactor_MCEM, rotate = "none")
+
+#Results from July 24th test - iterations stopped before convergance
+#SS loadings:  14.528 28.678 29.534 32.202 20.185 
+#Proportion Var:  0.077 0.153 0.157 0.171 0.107 
+
+MIRT_Mode_Median_FiveFactor_MCEM@Fit$AIC
+MIRT_Mode_Median_FiveFactor_MCEM@Fit$BIC
+
+
+#~~~~~~~~~~~~~~~~~~~~QMCEM~~~~~~~~~~~~~~~~~~
+#Quasi Monte Carlo EM estimation 
+MIRT_Mode_Median_FiveFactor_QMCEM<- mirt(Imputed_Mode_Median_Data, 5, itemtype=itemT, 
+                                        method = "QMCEM")
+MIRT_Mode_Median_FiveFactor_QMCEM_Summary <- summary(MIRT_Mode_Median_FiveFactor_QMCEM, rotate = "none")
+#Results from July 25th test - coverge on iteration 98
+#SS loadings:  33.389 18.283 19.924 21.911 11.351 
+#Proportion Var:  0.178 0.097 0.106 0.117 0.06 
+
+MIRT_Mode_Median_FiveFactor_QMCEM@Fit$AIC
+MIRT_Mode_Median_FiveFactor_QMCEM@Fit$BIC
+
+
+#~~~~~~~~~~~~~~~~~~~~MHRM~~~~~~~~~~~~~~~~~~
+#Metropolis-Hastings Robbins-Monro (MHRM) - not possible for grouped indvidual model 
+MIRT_Mode_Median_FiveFactor_MHRM<- mirt(Imputed_Mode_Median_Data, 5, itemtype=itemT, 
+                                        method = "MHRM",technical = list(NCYCLES=10000))
+#Results from July 25th test 
+#Stage 3 = 2000, LL = -5994.1, AR(0.01) = [0.38], gam = 0.0006, Max-Change = 0.0233
+#MHRM terminated after 2000 iterations.
+
+#Run on 9/18/2018
+#Stage 3 = 10000, LL = -6007.0, AR(0.01) = [0.25], gam = 0.0002, Max-Change = 0.0073
+#MHRM terminated after 10000 iterations.
+
+MIRT_Mode_Median_FiveFactor_MHRM_Summary <- summary(MIRT_Mode_Median_FiveFactor_MHRM, rotate = "none")
+#Results from July 25th test 
+#SS loadings:  33.893 20.5 28.189 28.486 19.428 
+#Proportion Var:  0.18 0.109 0.15 0.152 0.103 
+
+MIRT_Mode_Median_FiveFactor_MHRM@Fit$AIC
+#Results from July 25th test 
+#2832
+MIRT_Mode_Median_FiveFactor_MHRM@Fit$BIC
+#Results from July 25th test 
+#5699.898
+
+#~~~~~~~~~Rotations~~~~~~~~~~~~~~~
+MIRT_Scores_Unrotated_FiveFactors<- fscores(MIRT_Mode_Median_FiveFactor_MCEM, rotate="none")
+MIRT_Loadings_Unrotated_FiveFactors<- MIRT_Mode_Median_FiveFactor_MCEM
+rownames(MIRT_Scores_Unrotated_FiveFactors) <- Countries
+
+#record the parameters for the variables(items)
+Coefficients_Ordering5F<-coef(MIRT_Mode_Median_FiveFactor_MCEM,  simplify = TRUE)
+Coefficients_Ordering5F_DF<- as.data.frame(Coefficients_Ordering5F$items)
+
+#From GPCM and NRM modelled items
+#SS loadings:  33.974 32.939 26.546 23.082 23.878 
+#Proportion Var:  0.172 0.166 0.134 0.117 0.121 
+#71% of variance explained
+
+#MIRT_Scores_Varimax_5F<- fscores(MIRT_Mode_Median_5F,rotate = "varimax")
+#MIRT_Loading_Varimax_5F <- summary(MIRT_Mode_Median_5F, rotate="varimax")
+#Rotated SS loadings:  34.67 28.28 25.156 26.271 26.042 
+
+#MIRT_Scores_Oblimin_5F<- fscores(MIRT_Mode_Median_5F,rotate = "oblimin")
+#MIRT_Loading_Oblimin <- summary(MIRT_Mode_Median, rotate="oblimin")
+#Rotated SS loadings:  33.336 28.113 24.989 26.303 24.94 
+
+#Factor correlations: 
+#       F1     F2     F3     F4     F5
+#F1  1.000  0.124 -0.018 -0.158  0.044
+#F2  0.124  1.000 -0.017  0.022 -0.032
+#F3 -0.018 -0.017  1.000 -0.033  0.034
+#F4 -0.158  0.022 -0.033  1.000 -0.109
+#F5  0.044 -0.032  0.034 -0.109  1.000
+
+sink()
+```
+
+## Four Factor Model
+```{r Mirt 4F Model}
+sink("Central_Tendency_4F.txt")
+timestamp <- format(Sys.time(), "%m%d%Y_%H%M%S") 
+modelname <-"Central_Tendency_4F_MCEM"
+cat(modelname)
+
+timestamp
+
+#~~~~~~~~~~~~~~~~~~~~MCEM~~~~~~~~~~~~~~~~~~
+#this samples from the 56 countries multiple times in order to reduce the demand on the E and M steps. 
+MIRT_Mode_Median_FourFactor_MCEM<- mirt(Central_Tendency_Data,
+                                        4,
+                                        itemtype=itemT, 
+                                        method = "MCEM",
+                                        technical = list(NCYCLES=1500))
+#Results from July 25th test
+#Iteration: 500, Log-Lik: -6631.338, Max-Change: 1.45381
+#EM cycles terminated after 500 iterations.
+
+MIRT_Mode_Median_FourFactor_MCEM_Summary <- summary(MIRT_Mode_Median_FourFactor_MCEM, rotate = "none")
+#July 25 Results
+#SS loadings:  30.144 31.768 31.833 23.015 
+#Proportion Var:  0.16 0.169 0.169 0.122 
+
+
+#Compare_4F_MCEM <- MIRT_Mode_Median_FourFactor_MCEM_Summary$rotF
+#write.csv(Compare_4F_MCEM, "4F_MCEM.csv")
+
+MIRT_Mode_Median_FourFactor_MCEM@Fit$AIC
+MIRT_Mode_Median_FourFactor_MCEM@Fit$BIC
+
+
+#~~~~~~~~~~~~~~~~~~~~QMCEM~~~~~~~~~~~~~~~~~~
+modelname <-"Central_Tendency_4F_QMCEM"
+cat(modelname)
+
+#Quasi Monte Carlo EM estimation 
+MIRT_Mode_Median_FourFactor_QMCEM<- mirt(Central_Tendency_Data,
+                                         4, 
+                                         itemtype=itemT, 
+                                         method = "QMCEM")
+#Results from July 25th test - coverge on iteration 74
+#Iteration: 74, Log-Lik: -6478.855, Max-Change: 0.00008
+
+MIRT_Mode_Median_FourFactor_QMCEM_Summary <- summary(MIRT_Mode_Median_FourFactor_QMCEM, rotate = "none")
+#Results from July 25th test - coverge on iteration 74
+#SS loadings:  30.007 18.797 21.309 26.973 
+#Proportion Var:  0.16 0.1 0.113 0.143 
+
+MIRT_Mode_Median_FourFactor_QMCEM@Fit$AIC
+#Results from July 25th test
+#15421.71
+MIRT_Mode_Median_FourFactor_QMCEM@Fit$BIC
+#Results from July 25th test
+#7916.94
+
+#~~~~~~~~~~~~~~~~~~~~MHRM~~~~~~~~~~~~~~~~~~
+modelname <-"Central_Tendency_4F_MHRM"
+cat(modelname)
+
+#Metropolis-Hastings Robbins-Monro (MHRM) - not possible for grouped indvidual model 
+MIRT_Mode_Median_FourFactor_MHRM<- mirt(Imputed_Mode_Median_Data, 4, itemtype=itemT, method = "MHRM")
+
+#Model Run on July 25th 2018
+#Stage 3 = 6, LL = -6464.4, AR(0.01) = [0.00], gam = 0.0532, Max-Change = 0.00002
+#Calculating log-likelihood...
+
+MIRT_Mode_Median_FourFactor_MHRM_Summary <- summary(MIRT_Mode_Median_FourFactor_MHRM, rotate = "none")
+#Model Run on July 25th 2018
+#SS loadings:  35.677 20.32 24.054 32.089 
+#Proportion Var:  0.19 0.108 0.128 0.171 
+
+
+MIRT_Mode_Median_FourFactor_MHRM_Summary <- summary(MIRT_Mode_Median_FourFactor_MHRM, rotate = "varimax")
+#Compare_4F_MHRM <- MIRT_Mode_Median_FourFactor_MHRM_Summary$rotF
+#write.csv(Compare_4F_MHRM, "4F_MHRM_Varimax.csv")
+
+
+
+MIRT_Mode_Median_FourFactor_MHRM@Fit$AIC
+#Model Run on July 25th 2018
+#22107.31
+MIRT_Mode_Median_FourFactor_MHRM@Fit$BIC
+#Model Run on July 25th 2018
+#24602.54
+
+
+#record the parameters for the variables(items)
+Coefficients_Ordering4F<- coef(MIRT_Mode_Median_FourFactor_MCEM, simplify = TRUE)
+Coefficients_Ordering4F_DF <- as.data.frame(Coefficients_Ordering4F$items)
+#write.csv(Coefficients_Ordering4F_DF, "Coefficient_4F.csv")
+
+#this samples from the 54 countries and computes standard errors for parameters
+MIRT_Mode_Median_FourFactor_MCEM_SE<- mirt(Imputed_Mode_Median_Data, 4, itemtype=itemT, method = "MHRM", SE=TRUE)
+MIRT_Mode_Median_FourFactor_MCEM_Summary_SE <- summary(MIRT_Mode_Median_FourFactor_MCEM_SE, rotate = "none")
+
+
+#itemfit(MIRT_Mode_Median_FourFactor_MCEM, "S_X2", 155, QMC=TRUE)
+#Item158 <- extract.item(MIRT_Mode_Median_FourFactor_MCEM,158) 
+#going to look at the 158th - binary variable - should have two columns, looking to see if it reformatted variables 
+#Theta <- t(matrix(seq(-4,4, by = 0.2), 4))
+#traceline155 <- probtrace(Item158, Theta)
+#head(data.frame(traceline100, Theta=Theta))
+```
+
+##Three Factor Model
+We then ran a 3 factor IRF model, because utlimately it is easier to understand if there are less factors. 
+```{r MIRT 3F, warning=FALSE}
+library(stats4)
+library(lattice)
+library(mirt)
+
+Threeitemtype <- read.csv("Itemtype.csv")
+itemT<-as.character(Threeitemtype$Model.Required)
+
+#this samples from the 56 countries multiple times in order to reduce the demand on the E and M steps. 
+MIRT_Mode_Median_ThreeFactor_MCEM<- mirt(Imputed_Mode_Median_Data, 3, itemtype=itemT, 
+                                         method = "MCEM", technical = list(NCYCLES=2000))
+MIRT_Mode_Median_ThreeFactor_MCEMSummary <- summary(MIRT_Mode_Median_ThreeFactor_MCEM, rotate = "none")
+#Error: Model did not converge (unacceptable gradient caused by extreme parameter values)
+#Changed to QMCEM
+#Reattempt on July 20 2018 
+#Iteration: 500, Log-Lik: -6886.572, Max-Change: 0.37797
+
+MIRT_Mode_Median_ThreeFactor_MCEM@Fit$AIC
+MIRT_Mode_Median_ThreeFactor_MCEM@Fit$BIC
+
+#[1] 15794.59
+#[1] 17915.13
+
+#compare MCEM and MHRM
+MIRT_Mode_Median_ThreeFactor_MHRM<- mirt(Imputed_Mode_Median_Data, 3, itemtype=itemT, 
+                                         method = "MHRM")
+MIRT_Mode_Median_ThreeFactor_MHRMSummary <- summary(MIRT_Mode_Median_ThreeFactor_MHRM, rotate = "none")
+
+MIRT_Mode_Median_ThreeFactor_MHRM@Fit$AIC
+#2094
+MIRT_Mode_Median_ThreeFactor_MHRM@Fit$BIC
+#4214.53
+
+MIRT_Scores_Unrotated_ThreeFactors<- fscores(MIRT_Mode_Median_ThreeFactor_MCEM, rotate="none")
+MIRT_Loadings_Unrotated_ThreeFactors<- MIRT_Mode_Median_ThreeFactor_MCEM
+rownames(MIRT_Scores_Unrotated_ThreeFactors) <- Countries
+```
+
+```{r Understanding Model Fit}
+#Bootstrap_SE <- boot.mirt(MIRT_Mode_Median_ThreeFactor)
+#GoodnessofFit <- M2(MIRT_Mode_Median_ThreeFactor, QMC=TRUE)
+#Not enough space of computer to run. Error: cannot allocate vector of size 2.4GB
+
+#modSE <- mirt(Imputed_Mode_Median_Data,3,itemtype=itemT,pars=mod2values(MIRT_Mode_Median_ThreeFactor),SE=TRUE,TOL=0.01)
+#Error M-step optimizer converged immediately. Solution is either at the ML or starting values are causing issues and should be adjusted
+
+#boot.mirt(MIRT_Mode_Median_ThreeFactor, R=1000)
+#Warning: Note: bootstrapped standard errors for slope parameters in exploratory models are not meaningful.
+
+#MIRT_Mode_Median_ThreeFactor<- mirt(Imputed_Mode_Median_Data, 3, itemtype=itemT, method = "EM", verbose=FALSE, 
+                                    #SE=TRUE, technical = list(SEtol = 1e-4))
+#MIRT_Mode_Median_ThreeFactor_Summary <- summary(MIRT_Mode_Median_ThreeFactor, rotate = "none")
+#SS loadings:  25.806 20.222 19.86 
+#Proportion Var:  0.137 0.108 0.106 
+
+#results from two item type:
+#SS loadings:  40.632 25.09 27.243 
+#Proportion Var:  0.216 0.133 0.145
+#49.4% of Variance explained by 3 factors
+```
+
+##Two Factor Model
+Then we ran a 2 factor model.
+```{r Two Factor Model}
+library(stats4)
+library(lattice)
+library(mirt)
+
+#this samples from the 54 countries multiple times in order to reduce the demand on the E and M steps. 
+MIRT_Mode_Median_TwoFactor_MCEM<- mirt(Imputed_Mode_Median_Data, 2, itemtype=itemT, 
+                                       method = "MCEM" , verbose=FALSE)
+MIRT_Mode_Median_TwoFactor_MCEM_Summary <- summary(MIRT_Mode_Median_TwoFactor_MCEM, rotate = "none")
+## SS loadings:  41.74 20.999 
+## Proportion Var:  0.222 0.112 
+
+MIRT_Mode_Median_TwoFactor_MCEM@Fit$AIC
+MIRT_Mode_Median_TwoFactor_MCEM@Fit$BIC
+
+MIRT_Mode_Median_TwoFactor_MHRM<- mirt(Imputed_Mode_Median_Data, 2, itemtype=itemT, 
+                                       method = "QMCEM" , verbose=FALSE)
+MIRT_Mode_Median_TwoFactor_MHRM_Summary <- summary(MIRT_Mode_Median_TwoFactor_MCEM, rotate = "none")
+
+MIRT_Mode_Median_TwoFactor_MHRM@Fit$AIC
+MIRT_Mode_Median_TwoFactor_MHRM@Fit$BIC
+
+#MIRT_Mode_Median_OneFactor<- mirt(Imputed_Mode_Median_Data, 1, itemtype=itemT, method = "EM", verbose=FALSE, 
+                                  #  SE=TRUE, technical = list(SEtol = 1e-4))
+#Coefficient_StEr_OneFactor <- coef(MIRT_Mode_Median_ThreeFactor, printSE = TRUE)
+
+MIRT_Scores_Unrotated_TwoFactors<- fscores(MIRT_Mode_Median_TwoFactor_MCEM, rotate="none")
+MIRT_Loadings_Unrotated_TwoFactors<- MIRT_Mode_Median_TwoFactor_MCEM
+rownames(MIRT_Scores_Unrotated_TwoFactors) <- Countries
+
+#record the parameters for the variables(items)
+Coefficients_Ordering2F<- coef(MIRT_Mode_Median_TwoFactor_MCEM, simplify = TRUE)
+Coefficients_Ordering2F_DF<- as.data.frame(Coefficients_Ordering2F$items)
+```
+
+#One Factor Model
+Then we ran a 1 factor model.
+```{r One Factor Model}
+library(stats4)
+library(lattice)
+library(mirt)
+
+#this samples from the 54 countries multiple times in order to reduce the demand on the E and M steps. 
+MIRT_Mode_Median_OneFactor_MCEM<- mirt(Imputed_Mode_Median_Data, 1, itemtype=itemT, 
+                                       method = "MCEM", technical = list(NCYCLES=2000))
+
+MIRT_Mode_Median_OneFactor_EM<- mirt(Imputed_Mode_Median_Data, 1, itemtype=itemT, 
+                                       method = "EM")
+#Iteration: 126, Log-Lik: -7773.497, Max-Change: 0.00009
+#Log-likelihood was decreasing near the ML solution. EM method may be unstable
+
+
+MIRT_Mode_Median_OneFactor_MCEM_Summary <- summary(MIRT_Mode_Median_OneFactor_MCEM, rotate = "none")
+#SS loadings:  40.926 
+#Proportion Var:  0.218
+
+MIRT_Mode_Median_OneFactor_MCEM@Fit$AIC
+MIRT_Mode_Median_OneFactor_MCEM@Fit$BIC
+
+MIRT_Mode_Median_OneFactor_MHRM<- mirt(Imputed_Mode_Median_Data, 1, itemtype=itemT, 
+                                       method = "MHRM")
+MIRT_Mode_Median_OneFactor_MHRM_Summary <- summary(MIRT_Mode_Median_OneFactor_MCEM, rotate = "none")
+
+MIRT_Mode_Median_OneFactor_MHRM@Fit$AIC
+MIRT_Mode_Median_OneFactor_MHRM@Fit$BIC
+
+#MIRT_Mode_Median_OneFactor<- mirt(Imputed_Mode_Median_Data, 1, itemtype=itemT, method = "EM", verbose=FALSE, 
+                                  #  SE=TRUE, technical = list(SEtol = 1e-4))
+#Coefficient_StEr_OneFactor <- coef(MIRT_Mode_Median_ThreeFactor, printSE = TRUE)
+
+MIRT_Scores_Unrotated_OneFactors<- fscores(MIRT_Mode_Median_OneFactor_MCEM, rotate="none")
+MIRT_Loadings_Unrotated_OneFactors<- MIRT_Mode_Median_OneFactor_MCEM
+rownames(MIRT_Scores_Unrotated_OneFactors) <- Countries
+
+#record the parameters for the variables(items)
+Coefficients_Ordering1F<- coef(MIRT_Mode_Median_OneFactor_MCEM, simplify = TRUE)
+Coefficients_Ordering1F_DF<- as.data.frame(Coefficients_Ordering1F$items)
+```
+
+#Understanding the 4 Factor Model 
+We have decided that the 4 factor model is the best fit of the data based on porportion of variance and the AIC and BIC fit measures. Now we will rotate the factors to determine if those help with interpretation. 
+
+##Standard Errors of Model Parameters
+```{r}
+Coefficients_Ordering4F_SE<- coef(MIRT_Mode_Median_FourFactor_MCEM_SE, printSE=TRUE)
+#print paramters with standard error values
+Coefficients_Ordering4F_SE
+```
+
+##Four Factor Laodings
+```{r Plot Factor Loadings}
+#No rotations
+MIRT_Loadings_Unrotated_FourFactors <- summary(MIRT_Mode_Median_FourFactor_MCEM, rotate = "none")
+MIRT_Loadings_Unrotated <- as.data.frame(MIRT_Loadings_Unrotated_FourFactors$rotF)
+FourFactor_Rownames  <- rownames(MIRT_Loadings_Unrotated_FourFactors$rotF)
+FourFactor_Rownames <- as.character(FourFactor_Rownames)
+
+#Varimax - rotates the factors but keeps them orthogonal and uncorrelated
+MIRT_Loadings_Varimax_FourFactors <- summary(MIRT_Mode_Median_FourFactor_MCEM, rotate = "varimax")
+#Rotated SS loadings:  26.858 24.832 45.336 19.116 
+MIRT_Loadings_Varimax <- as.data.frame(MIRT_Loadings_Varimax_FourFactors$rotF)
+MIRT_Communalities_Varimax <- as.data.frame(MIRT_Loadings_Varimax_FourFactors$h2)
+FourFactor_Rownames  <- rownames(MIRT_Loadings_Varimax_FourFactors$rotF)
+FourFactor_Rownames <- as.character(FourFactor_Rownames)
+
+#Oblmin - rotation allows the factors to be correlated
+MIRT_Loadings_Oblimin_FourFactors <- summary(MIRT_Mode_Median_FourFactor_MCEM, rotate = "oblimin")
+MIRT_Loadings_Oblimin <- as.data.frame(MIRT_Loadings_Oblimin_FourFactors$rotF)
+FourFactor_Rownames  <- rownames(MIRT_Loadings_Oblimin_FourFactors$rotF)
+FourFactor_Rownames <- as.character(FourFactor_Rownames)
+
+par(mfrow = c(3,3), mar = c(2, 2 , 1.5, 1.5))
+plot(MIRT_Loadings_Unrotated$F1, MIRT_Loadings_Unrotated$F2, main = "Unrotated F1 & F2 (a)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Varimax$F1, MIRT_Loadings_Varimax$F2, main = "Varimax F1 & F2 (b)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Oblimin$F1, MIRT_Loadings_Oblimin$F2,  main = "Oblimin F1 & F2 (c)")
+abline(h=0, v=0)
+
+plot(MIRT_Loadings_Unrotated$F1, MIRT_Loadings_Unrotated$F3, main = "Unrotated F1 & F3 (d)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Varimax$F1, MIRT_Loadings_Varimax$F3, main = "Varimax F1 & F3 (e)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Oblimin$F1, MIRT_Loadings_Oblimin$F3,  main = "Oblimin F1 & F3 (f)")
+abline(h=0, v=0)
+
+plot(MIRT_Loadings_Unrotated$F1, MIRT_Loadings_Unrotated$F4, main = "Unrotated F1 & F4 (g)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Varimax$F1, MIRT_Loadings_Varimax$F4, main = "Varimax F1 & F4 (h)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Oblimin$F1, MIRT_Loadings_Oblimin$F4,  main = "Oblimin F1 & F4 (i)")
+abline(h=0, v=0)
+
+par(mfrow = c(3,3), mar = c(2, 2 , 1.5, 1.5))
+plot(MIRT_Loadings_Unrotated$F2, MIRT_Loadings_Unrotated$F3, main = "Unrotated F2 & F3 (j)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Varimax$F2, MIRT_Loadings_Varimax$F3, main = "Varimax F2 & F3 (k)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Oblimin$F2, MIRT_Loadings_Oblimin$F3,  main = "Oblimin F2 & F3 (l)")
+abline(h=0, v=0)
+
+plot(MIRT_Loadings_Unrotated$F2, MIRT_Loadings_Unrotated$F4, main = "Unrotated F2 & F4 (m)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Varimax$F2, MIRT_Loadings_Varimax$F4, main = "Varimax F2 & F4 (n)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Oblimin$F2, MIRT_Loadings_Oblimin$F4,  main = "Oblimin F2 & F4 (o)")
+abline(h=0, v=0)
+
+plot(MIRT_Loadings_Unrotated$F3, MIRT_Loadings_Unrotated$F4, main = "Unrotated F3 & F4 (p)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Varimax$F3, MIRT_Loadings_Varimax$F4, main = "Varimax F3 & F4 (q)")
+abline(h=0, v=0)
+plot(MIRT_Loadings_Oblimin$F3, MIRT_Loadings_Oblimin$F4,  main = "Oblimin F3 & F4 (r)")
+abline(h=0, v=0)
+```
+
+```{r Plot of Varimax Factor Loadings}
+plot(MIRT_Loadings_Varimax$F1, type = "l", main = "PC1 - Varimax")
+abline(h=0.5, col="red")
+abline(h=-0.5, col="red")
+abline(h=0.6, col="grey")
+abline(h=-0.6, col="grey")
+abline(h=0.4, col="blue")
+abline(h=-0.4, col="blue")
+
+plot(MIRT_Loadings_Varimax$F2, type = "l", main = "PC2 - Varimax")
+abline(h=0.5, col="red")
+abline(h=-0.5, col="red")
+abline(h=0.6, col="grey")
+abline(h=-0.6, col="grey")
+abline(h=0.4, col="blue")
+abline(h=-0.4, col="blue")
+
+plot(MIRT_Loadings_Varimax$F3, type = "l", main = "PC3 - Varimax")
+abline(h=0.5, col="red")
+abline(h=-0.5, col="red")
+abline(h=0.6, col="grey")
+abline(h=-0.6, col="grey")
+abline(h=0.4, col="blue")
+abline(h=-0.4, col="blue")
+
+plot(MIRT_Loadings_Varimax$F4, type = "l", main = "PC4 - Varimax")
+abline(h=0.5, col="red")
+abline(h=-0.5, col="red")
+abline(h=0.6, col="grey")
+abline(h=-0.6, col="grey")
+abline(h=0.4, col="blue")
+abline(h=-0.4, col="blue")
+```
+
+```{r Cleaning Factor Loadings}
+MIRT_Loadings_Varimax <- as.data.frame(MIRT_Loadings_Varimax_FourFactors$rotF)
+MIRT_Loadings_Varimax <- apply(MIRT_Loadings_Varimax,2,as.numeric)
+rownames(MIRT_Loadings_Varimax)<- FourFactor_Rownames
+MIRT_Loadings_Varimax[abs(MIRT_Loadings_Varimax) <= 0.55] = NA
+MIRT_Loadings_Varimax_Cleaned <- MIRT_Loadings_Varimax
+#write.csv(MIRT_Loadings_Varimax_Cleaned, "MIRT_Loadings_Varimax.csv")
+MIRT_Loadings_Varimax_Cleaned <- as.data.frame(MIRT_Loadings_Varimax_Cleaned)
+```
+
+#Four Factor Varimax Scores
+```{r Merge Data with Country Names}
+#High-dimensional models factor scores should use quasi-Monte Carlo integration. Pass QMC=TRUE
+MIRT_Scores_Varimax_FourFactors<- fscores(MIRT_Mode_Median_FourFactor_MCEM,
+                                          rotate="varimax", 
+                                          method = "MAP", 
+                                          full.scores = TRUE, 
+                                          full.scores.SE = TRUE, 
+                                          QMC = TRUE)
+
+rownames(MIRT_Scores_Varimax_FourFactors) <- Countries
+
+Reliability <- empirical_rxx(MIRT_Scores_Varimax_FourFactors)
+#       F1        F2        F3        F4 
+#0.9879444 0.9652061 0.9643217 0.9617517 
+Reliability
+
+
+#Country_Names <-read.csv("Country_Code_Names.csv")
+#Country_Names <-Country_Names[,c("Country.Code", "Country.Title")]
+Named_MIRT_Data <- merge(Country_Names, MIRT_Scores_Varimax_FourFactors, by.y= 0, by.x ="Country.Code", all.y=T)
+Named_MIRT_Data 
+#write.csv(Named_MIRT_Data, "MIRT_Scores_Varimax_FourFactors_042618.csv")
+```
+
+Distribution of scores for all four factors 
+Numerical scale for use in linear regression
+```{r}
+hist(Named_MIRT_Data$F1)
+hist(Named_MIRT_Data$F2)
+hist(Named_MIRT_Data$F3)
+hist(Named_MIRT_Data$F4)
+```
+
+
+
+##Four Factor Variable Interpretation
+```{r Adding Variable Interpretation}
+#Add variable descriptions to 188 varaibles in Mean/median data frame.
+Descriptions <- read.csv("Codebook.csv")
+rownames(Descriptions) <- Descriptions$VAR
+Codebook_AddDescriptions<- Descriptions[c(colnames(Individual_MIRTData)),]
+
+Itemtype_Order <- read.csv("Coefficients_Ordering3F_DF_ItemType.csv")
+Itemtype_Order <- as.data.frame(Itemtype_Order[ ,c(1,15:17)])
+Items <- Itemtype_Order[1]
+
+#find the range of codes used on the Imputed_Mode_Median_Data
+Minimum_Code <- as.data.frame(apply(Imputed_Mode_Median_Data, 2, min))
+rownames(Minimum_Code) = Items$ï..Item
+Maximum_Code <- as.data.frame(apply(Imputed_Mode_Median_Data, 2, max))
+rownames(Maximum_Code) = Items$ï..Item
+Min_Max <- cbind(Minimum_Code, Maximum_Code)
+colnames(Min_Max) <- c("Minimum", "Maximum")
+
+#Mergeing by variable names - need to check that all are the same.
+Codebook_AddDescriptions<- merge(Codebook_AddDescriptions, Min_Max, by.x = 0, by.y=0, all.x=TRUE, sort = FALSE)
+
+Codebook_AddDescriptions<- merge(Codebook_AddDescriptions, Itemtype_Order, by.x = "Row.names", by.y="ï..Item", 
+                                 all.x=TRUE, sort = FALSE)
+
+#add the category ordereing parameters (ak_)
+Variable <-  c("V161","V162","V163","V5","V6","V7","V8","V9","V10","V11","V70","V71","V72","V73",
+               "V75","V76","V77","V78","V79","V74","V165","V166","V167","V168","V169","V45","V46","V49",
+               "V54","V51","V52","V50","V48","V47","V53","V67","V68","V69","V84","V85","V86","V87",
+               "V88","V89","V108","V109","V110","V111","V112","V113","V114","V115","V116","V117","V118","V119",  
+               "V120","V121","V122","V123","V124","V126","V127","V128","V129","V130","V142","V225","V226","V227", 
+               "V217","V218","V223","V224","V219","V220","V221","V222","V143","V145","V146","V153","V154","V155",  
+               "V156","V211","V103","V104","V105","V106","V107","V212","V213","V214","V216","V170","V171","V172",
+               "V173","V174","V175","V181","V182","V183","V184","V185","V186","V188","V189","V190","V191","V23",
+               "V56","V55","V157","V158","V159","V160","V164","V59","V95","V96","V97","V98","V99","V100",
+               "V101","V131","V132","V134","V135","V136","V137","V138","V141","V192","V194","V197","V198","V200",
+               "V209","V210","V199","V201","V202","V203","V204","V205","V207","V206","V208","V195","V196",
+               "V25","V61","V62","V63","V64","V65","V80","V81","V147","V150","V151","V13","V14","V15","V16",
+               "V17","V18","V19","V20","V21","V22","V24","V37","V38","V39","V40","V41","V42","V43",
+               "V66","V148","V149","V176","V177","V187")
+
+Coefficients_Ordering4F_DF_Rename <- cbind(Variable, Coefficients_Ordering4F_DF)
+Codebook_AddDescriptions<- merge(Codebook_AddDescriptions,       
+                                 Coefficients_Ordering4F_DF_Rename[,c(1,6,7,8,15,17,19,20,23,25,26,12)],
+                                 all.x = TRUE, by.x = "Row.names", by.y = "Variable", sort = FALSE)
+#merge with loadings 
+MIRT_Loadings_Varimax <- cbind(Variable, MIRT_Loadings_Varimax)
+Loadings_VariableDescriptions <- merge(Codebook_AddDescriptions, MIRT_Loadings_Varimax, by.x="Row.names", by.y="Variable",
+                                       all.x = TRUE, sort = FALSE)
+
+#merge with commonalities
+MIRT_Communalities_Varimax <- cbind(Variable, MIRT_Communalities_Varimax)
+Loadings_VariableDescriptions <- merge(Loadings_VariableDescriptions, MIRT_Communalities_Varimax, by.x="Row.names", by.y="Variable",
+                                       all.x = TRUE, sort = FALSE)
+
+#now need to add themes to this dataframe (theme interpretation is dependent on how the variable loads onto the factor)
+#write.csv(Loadings_VariableDescriptions,"Imputed_Mode_Median_Data_AddInterpretations.csv")
+
+#This dataframe will include variable descriptions and theme interpretation. 
+#Loadings_ThemeDescriptions <- read.csv("Imputed_Mode_Median_Data_ThemeDescriptions.csv")
+```

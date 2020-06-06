@@ -1,0 +1,267 @@
+---
+title: "05c - Model Validation"
+author: "Leigh Allison"
+date: "January 14, 2019"
+output: html_document
+---
+```{r Load package librarys}
+library(ggplot2)
+```
+ 
+```{r Load Weighted Mean - Country Scores}
+Transformed_Country_Means<- read.csv("Transformed_CountryMeans_CFA_5F_NC3O.csv")
+RegressionScores <-Transformed_Country_Means[,c(2,3,9:13)]
+```
+
+#Bubble Plots of Country Scores
+```{r Bubble Plots of Country Scores, eval=FALSE}
+Scores_Plot1 <- ggplot(RegressionScores, aes(x = CD_1, y = CD_3, size = CD_2, fill = Region)) +
+        geom_point(shape = 21) +
+        labs(x = "CD_1: Religousity", y = "CD_3: Fairness",
+             size = "CD_2: Collectivism", fill = "Region") +
+        scale_size(range = c(1, 10)) +
+        
+        theme(legend.position = "bottom", legend.direction = "horizontal",
+              legend.box = "horizontal",
+              axis.line = element_line(size=1, colour = "black"),
+              panel.grid.major = element_line(colour = "#d3d3d3"),
+              panel.grid.minor = element_line(colour = "gray80"),
+              panel.border = element_blank(), panel.background = element_blank(),
+              plot.title = element_text(size = 14, face = "bold"),
+              axis.text.x=element_text(colour="black", size = 9),
+              axis.text.y=element_text(colour="black", size = 9)
+              )
+
+print(Scores_Plot1 + scale_fill_grey() )
+
+pdf(file="Scores_Plot1.pdf",width=14,height=7,paper='special') 
+print(Scores_Plot1 + scale_fill_grey() )
+dev.off()
+```
+
+
+```{r Comparison with Hofstede's Dimensions}
+#Merge Scores with Hofstede dimensions
+
+Hofstede_6D <- read.csv("Hofstede_6D_2015.csv")
+Validate_Scores_Hof6D <- merge(RegressionScores, Hofstede_6D, 
+                               by.x = "Country.Title", by.y = "Country")
+#49 of 56 countries overlap with his addition of 2 new dimensions
+#Create DF with all correlations and p.values
+Correlation_DF <- c()
+Correlation_DF_Complete <- t(data.frame(0,0,0,0,0,0))
+for(i in colnames(Validate_Scores_Hof6D[,c(3:7)])){ #loop through all columns
+  for(j in 9:14){ #loop through all rows
+    Cor_test <- cor.test(Validate_Scores_Hof6D[,i], as.numeric(Validate_Scores_Hof6D[,j]))
+    Correlation_Col <- as.data.frame(cbind(Cor_test$parameter,Cor_test$estimate, Cor_test$p.value))
+    Correlation_DF <- rbind(Correlation_DF, Correlation_Col)
+    }
+    
+    Parameter1 <- paste(i,"DF",sep="_")
+    Parameter2 <- paste(i,"Correlation",sep="_")
+    Parameter3 <- paste(i, "P.value", sep="_")
+    colnames(Correlation_DF) <- c(Parameter1,Parameter2,Parameter3)
+    
+    Correlation_DF_Complete <- cbind(Correlation_DF_Complete, Correlation_DF)
+    row.names(Correlation_DF_Complete) <- colnames(Validate_Scores_Hof6D[,c(9:14)])
+    Correlation_DF <- c()
+}
+Hofstede_Correlations <- Correlation_DF_Complete
+write.csv(Correlation_DF_Complete, "Hofstede_Correlations.csv")
+```
+
+```{r Inglehart/Welzel Map Correlations}
+Inglehart_Welzel <- read.csv("WVS_MapIndex.csv")
+Validate_Scores_IW <- merge(RegressionScores, Inglehart_Welzel, by.x = "Country.Title", by.y = "Country")
+#54 of 56 Countries overlap (lost Germany and Georgia)
+
+Correlation_DF <- c()
+Correlation_DF_Complete <- t(data.frame(0,0))
+for(i in colnames(Validate_Scores_IW[,c(3:7)])){ #loop through all columns
+  for(j in 8:9){ #loop through all rows
+    Cor_test <- cor.test(Validate_Scores_IW[,i], as.numeric(Validate_Scores_IW[,j]))
+    Correlation_Col <- as.data.frame(cbind(Cor_test$parameter,Cor_test$estimate, Cor_test$p.value))
+    Correlation_DF <- rbind(Correlation_DF, Correlation_Col)
+    }
+    
+    Parameter1 <- paste(i,"DF",sep="_")
+    Parameter2 <- paste(i,"Correlation",sep="_")
+    Parameter3 <- paste(i, "P.value", sep="_")
+    colnames(Correlation_DF) <- c(Parameter1,Parameter2,Parameter3)
+    
+    Correlation_DF_Complete <- cbind(Correlation_DF_Complete, Correlation_DF)
+    row.names(Correlation_DF_Complete) <- colnames(Validate_Scores_IW[,c(8:9)])
+    Correlation_DF <- c()
+}
+IW_Correlations <- Correlation_DF_Complete
+write.csv(Correlation_DF_Complete, "IW_Correlations.csv")
+```
+
+```{r Schwartz Correlations}
+Schwartz <- read.csv("Schwartz_CulturalValueOrientationScores.csv")
+Validate_Scores_Schwartz <- merge(RegressionScores, Schwartz, by.x = "Country.Title", by.y = "Country")
+#38 of 56 Countries overlap 
+
+Correlation_DF <- c()
+Correlation_DF_Complete <- t(data.frame(0,0,0,0,0,0,0))
+for(i in colnames(Validate_Scores_Schwartz[,c(3:7)])){ #loop through all columns
+  for(j in 9:15){ #loop through all rows
+    Cor_test <- cor.test(Validate_Scores_Schwartz[,i], as.numeric(Validate_Scores_Schwartz[,j]))
+    Correlation_Col <- as.data.frame(cbind(Cor_test$parameter,Cor_test$estimate, Cor_test$p.value))
+    Correlation_DF <- rbind(Correlation_DF, Correlation_Col)
+    }
+    
+    Parameter1 <- paste(i,"DF",sep="_")
+    Parameter2 <- paste(i,"Correlation",sep="_")
+    Parameter3 <- paste(i, "P.value", sep="_")
+    colnames(Correlation_DF) <- c(Parameter1,Parameter2,Parameter3)
+    
+    Correlation_DF_Complete <- cbind(Correlation_DF_Complete, Correlation_DF)
+    row.names(Correlation_DF_Complete) <- colnames(Validate_Scores_Schwartz[,c(9:15)])
+    Correlation_DF <- c()
+}
+Schwartz_Correlations <- Correlation_DF_Complete
+write.csv(Correlation_DF_Complete, "Shwartz_Correlations.csv")
+```
+
+```{r GLOBE Correlations}
+GLOBE <- read.csv("GLOBE_CulturalIndex.csv")
+Validate_Scores_GLOBE <- merge(RegressionScores, GLOBE, by.x = "Country.Title", by.y = "Country.Name")
+#30 of 56 Countries overlap 
+
+Correlation_DF <- c()
+Correlation_DF_Complete <- t(data.frame(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
+for(i in colnames(Validate_Scores_GLOBE[,c(3:7)])){ #loop through all columns
+  for(j in 9:26){ #loop through all rows
+    Cor_test <- cor.test(Validate_Scores_GLOBE[,i], as.numeric(Validate_Scores_GLOBE[,j]))
+    Correlation_Col <- as.data.frame(cbind(Cor_test$parameter,Cor_test$estimate, Cor_test$p.value))
+    Correlation_DF <- rbind(Correlation_DF, Correlation_Col)
+    }
+    
+    Parameter1 <- paste(i,"DF",sep="_")
+    Parameter2 <- paste(i,"Correlation",sep="_")
+    Parameter3 <- paste(i, "P.value", sep="_")
+    colnames(Correlation_DF) <- c(Parameter1,Parameter2,Parameter3)
+    
+    Correlation_DF_Complete <- cbind(Correlation_DF_Complete, Correlation_DF)
+    row.names(Correlation_DF_Complete) <- colnames(Validate_Scores_GLOBE[,c(9:26)])
+    Correlation_DF <- c()
+}
+GLOBE_Correlations <- Correlation_DF_Complete
+write.csv(Correlation_DF_Complete, "GLOBE_Correlations.csv")
+```
+
+
+Compare factor scores with sociodemographics.
+```{r}
+SD <- read.csv("SD_Raw_Data.csv")
+#Removed_Countries_SD  <- SD [SD$V2 %in% c(414, 634,48,818), ]
+
+Clean_SD <- SD[!SD$V2 %in% c(414, 634,48,818), ]
+#merge SD questions with factor scores.
+Factors_Scores <- read.csv("5F_CFA_Scores_NC3O_Transformed_Model.csv")
+
+Transformed_FScores_SD <- cbind(Factors_Scores, Clean_SD)
+hist(Transformed_FScores_SD$V248) #need to change negative values to NA
+library(car)
+RecodetoNA<- function(QuestionColName){
+  QuestionColName<- recode(QuestionColName, "c(-1,-2,-3,-4,-5,-6) = NA")
+}
+Transformed_FScores_SDNA <- as.data.frame(apply(Transformed_FScores_SD[,c(10:33)] ,2,RecodetoNA))
+summary(Transformed_FScores_SD$V248)
+
+Transformed_FScores_SD <- cbind(Transformed_FScores_SD[,c(1:9)],Transformed_FScores_SDNA)
+
+qplot(Transformed_FScores_SD$F1, Transformed_FScores_SD$F2, colour=Transformed_FScores_SD$V248)
+
+Education_F1 <- aov(Transformed_FScores_SD$F1~Transformed_FScores_SD$V248+
+                      Transformed_FScores_SD$V2 +
+                      Transformed_FScores_SD$V240)
+summary(Education_F1)
+
+
+Education_F2 <- aov(Transformed_FScores_SD$F2~Transformed_FScores_SD$V248+Transformed_FScores_SD$V2)
+summary(Education_F2)
+Education_F3 <- aov(Transformed_FScores_SD$F3~Transformed_FScores_SD$V248+Transformed_FScores_SD$V2)
+summary(Education_F3)
+Education_F4 <- aov(Transformed_FScores_SD$F4~Transformed_FScores_SD$V248+Transformed_FScores_SD$V2)
+summary(Education_F4)
+Education_F5 <- aov(Transformed_FScores_SD$F5~Transformed_FScores_SD$V248+Transformed_FScores_SD$V2)
+summary(Education_F5)
+
+
+Subset_112 <- Transformed_FScores_SD[Transformed_FScores_SD$V2 %in% c(112), ]
+qplot(Subset_112$F1, Subset_112$F2, colour=Subset_112$V248)
+```
+
+
+#Removed from Study
+```{r Smith/Trompenaars Correlations, eval=FALSE}
+ST <- read.csv("Smith_Trompenaars_Dimensions.csv")
+Validate_Scores_ST <- merge(RegressionScores, ST, by.x = "Country.Title", by.y = "Country")
+#23 of 56 Countries overlap 
+
+Correlation_DF <- c()
+Correlation_DF_Complete <- t(data.frame(0,0))
+for(i in colnames(Validate_Scores_ST[,c(4:8)])){ #loop through all columns
+  for(j in 9:10){ #loop through all rows
+    Cor_test <- cor.test(Validate_Scores_ST[,i], as.numeric(Validate_Scores_ST[,j]))
+    Correlation_Col <- as.data.frame(cbind(Cor_test$parameter,Cor_test$estimate, Cor_test$p.value))
+    Correlation_DF <- rbind(Correlation_DF, Correlation_Col)
+    }
+    
+    Parameter1 <- paste(i,"DF",sep="_")
+    Parameter2 <- paste(i,"Correlation",sep="_")
+    Parameter3 <- paste(i, "P.value", sep="_")
+    colnames(Correlation_DF) <- c(Parameter1,Parameter2,Parameter3)
+    
+    Correlation_DF_Complete <- cbind(Correlation_DF_Complete, Correlation_DF)
+    row.names(Correlation_DF_Complete) <- colnames(Validate_Scores_ST[,c(9:10)])
+    Correlation_DF <- c()
+}
+ST_Correlations <- Correlation_DF_Complete
+write.csv(Correlation_DF_Complete, "ST_Correlations.csv")
+
+test <- lm(Validate_Scores_IW$CD_1~Validate_Scores_IW$CD_2+ Validate_Scores_IW$CD_3)
+summary(test)
+```
+
+```{r}
+
+Democracy_Index <- read.csv("Democracy_Index.csv")
+DI_Breadown <- read.csv("DI_Breakdown.csv")
+Validate_Scores <- merge(Validate_Scores, Democracy_Index, by.x = "Country.Title", by.y = "X")
+Validate_Scores <- merge(Validate_Scores, DI_Breadown, by.x = "Country.Title", by.y = "X")
+
+cor.test(Validate_Scores$CD_1, Validate_Scores$DI_2014)
+cor.test(Validate_Scores$CD_2, Validate_Scores$DI_2014)
+cor.test(Validate_Scores$CD_3, Validate_Scores$DI_2014)
+cor.test(Validate_Scores$CD_4, Validate_Scores$DI_2014)
+cor.test(Validate_Scores$CD_5, Validate_Scores$DI_2014)
+
+cor.test(Validate_Scores$CD_2, Validate_Scores$Electoral.Process.and.Pluralism)
+cor.test(Validate_Scores$CD_2, Validate_Scores$Functioning.of.Government)
+cor.test(Validate_Scores$CD_2, Validate_Scores$Political.Participation)
+cor.test(Validate_Scores$CD_2, Validate_Scores$Political.Culture)
+cor.test(Validate_Scores$CD_2, Validate_Scores$Civil.Liberties)
+```
+
+```{r}
+Democracy_Index_Comparison <- lm(Validate_Scores$F2 ~ Validate_Scores$DI_2014)
+summary(Democracy_Index_Comparison)
+
+Validate_regression <- lm(Validate_Scores$DI_2014~
+                            Validate_Scores$F1 + Validate_Scores$F2 + Validate_Scores$F3 +
+                            Validate_Scores$F4 + Validate_Scores$F5 + 
+                            Validate_Scores$Gross.Domestic.Product)
+summary(Validate_regression)
+
+
+Validate_regression <- lm(Validate_Scores$F2 ~ Validate_Scores$Electoral.Process.and.Pluralism +
+                            Validate_Scores$Functioning.of.Government +
+                            Validate_Scores$Political.Participation +
+                            Validate_Scores$Political.Culture + 
+                            Validate_Scores$Civil.Liberties)
+summary(Validate_regression)
+```
+

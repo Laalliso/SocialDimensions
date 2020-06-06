@@ -1,0 +1,2701 @@
+<<<<<<< HEAD
+---
+title: "03_National_Precentage_PCA"
+author: "Leigh Allison"
+date: "August 21, 2018"
+output: html_document
+---
+#Analyzing the National Precentage Variables
+```{r}
+WVS_Data_Precentages4 <- read.csv("WVS_Data_Percentages.csv")
+```
+
+## Analyzing the Characteristics of the National Precentage Variables:Variance of Variables
+Since the WVS has a variety of different question types, we wanted to look at the variance to determine if a specific type of question would mathematically appear in the components due to the structure of the question. Primarily we were concerned about questions which asked a yes or no question and those that asked a respondant to list 5 attributes they consider important and the  variables were coded as mentioned or not mentioned. We first looked at the variance of all the variables, then the two category responses (yes or no), then the lists (mention or not mentioned).
+```{r All variables}
+Variances <- c()
+for(i in 1:829){
+  Question_Variance <- var(WVS_Data_Precentages4[,i])
+  Variances <- cbind(Variances, Question_Variance)
+}
+
+colnames(Variances)<-colnames(WVS_Data_Precentages4)
+Variance_Sorted <- t(Variances)
+
+#pdf("Variance distribution.pdf", paper = "USr")
+par(mfrow=c(2, 1))
+hist(Variances, 50)
+abline(h=20, col = "red")
+barplot(Variances)
+#dev.off()
+```
+
+```{r Y/N Questions}
+#Break into two groups - Questions with 2 answers and those with more than 2 answers. 
+#Two answer questions: 12-22, 24, 36-44, 66, 82, 83, 148, 149, 150, 151, 176, 177, 178, 179, 180, 234, 235, 236, 240, 243, 244, 245,246, 250, 252
+
+TwoCategoryQuestions<- WVS_Data_Precentages4[,c("V24_1_Ref","V24_2",
+                                                "V66_1_Ref","V66_2",
+                                                "V82_1_Ref","V82_2",
+                                                "V83_1_Ref","V83_2" ,
+                                                "V148_1_Ref","V148_2",
+                                                "V149_1_Ref","V149_2",
+                                                "V150_1_Ref","V150_2",
+                                                "V151_1_Ref","V151_2",
+                                                "V176_1_Ref","V176_5",
+                                                "V177_1_Ref","V177_5",
+                                                "V178_1_Ref","V178_5",
+                                                "V179_1_Ref","V179_5",
+                                                "V180_1_Ref","V180_5",
+                                                "V187_1_Ref", "V187_2",
+                                                "V243_1_Ref","V243_2",
+                                                "V244_1_Ref","V244_2",
+                                                "V245_1_Ref","V245_2",
+                                                "V246_1_Ref","V246_2")]
+Variances_TwoCategory<- c()
+for(i in 1:36){
+  Question_Variance_TwoCategory <- var(TwoCategoryQuestions[,i])
+  Variances_TwoCategory <- cbind(Variances_TwoCategory, Question_Variance_TwoCategory)
+}
+colnames(Variances_TwoCategory)<-colnames(TwoCategoryQuestions)
+Variance_Sorted_TwoCategory <- t(Variances_TwoCategory)
+
+#pdf("Variance_TwoCategory distribution.pdf", paper = "USr")
+par(mfrow=c(2, 1))
+hist(Variances_TwoCategory)
+barplot(Variances_TwoCategory)
+#dev.off()
+```
+
+```{r Mention-Not Mention Questions}
+MentionQuestions<- WVS_Data_Precentages4[,c("V12_1_Ref", "V12_2",
+                                                       "V13_1_Ref", "V13_2",
+                                                       "V14_1_Ref", "V14_2",
+                                                       "V15_1_Ref", "V15_2",
+                                                       "V16_1_Ref", "V16_2",
+                                                       "V17_1_Ref", "V17_2",
+                                                       "V18_1_Ref", "V18_2",
+                                                       "V19_1_Ref", "V19_2",
+                                                       "V20_1_Ref", "V20_2",
+                                                       "V21_1_Ref", "V21_2",
+                                                       "V22_1_Ref", "V22_2",
+                                                       "V36_1_Ref", "V36_2",
+                                                       "V37_1_Ref", "V37_2",
+                                                       "V38_1_Ref", "V38_2",
+                                                       "V39_1_Ref", "V39_2",
+                                                       "V40_1_Ref", "V40_2",
+                                                       "V41_1_Ref", "V41_2",
+                                                       "V42_1_Ref", "V42_2",
+                                                       "V43_1_Ref", "V43_2",
+                                                       "V44_1_Ref", "V44_2")]
+Variances_Mention<- c()
+for(i in 1:40){
+  Question_Variance_Mention <- var(MentionQuestions[,i])
+  Variances_Mention <- cbind(Variances_Mention, Question_Variance_Mention)
+}
+colnames(Variances_Mention)<-colnames(MentionQuestions)
+Variance_Sorted_Mention<- t(Variances_Mention)
+
+#pdf("Variance_Mention distribution.pdf", paper = "USr")
+par(mfrow=c(2, 1))
+hist(Variances_Mention)
+barplot(Variances_Mention)
+#dev.off()
+```
+
+```{r Questions with 3 or more response categories}
+remove <- c(colnames(TwoCategoryQuestions), colnames(MentionQuestions))
+MultipleCat_Questions<- WVS_Data_Precentages4[,!colnames(WVS_Data_Precentages4) %in% remove]
+
+Variances_MultipleCat<- c()
+for(i in 1:753){
+  Question_Variance_MultipleCat <- var(MultipleCat_Questions[,i])
+  Variances_MultipleCat <- cbind(Variances_MultipleCat, Question_Variance_MultipleCat)
+}
+colnames(Variances_MultipleCat)<-colnames(MultipleCat_Questions)
+Variance_Sorted_MultipleCat<- t(Variances_MultipleCat)
+
+#pdf("Variance_MultipleCat distribution.pdf", paper = "USr")
+par(mfrow=c(2, 1))
+hist(Variances_MultipleCat)
+barplot(Variances_MultipleCat)
+#dev.off()
+```
+
+We decided to remove the "no" and "not_mention" variables from the dataset because the variance will load in equal but opposite directions. However, since the variables are compliments, it does not matter which variables is removed.
+```{r Binary Variables to Remove}
+BinaryQuestions_RemoveVarible <- colnames(WVS_Data_Precentages4[,c("V12_2","V13_2", "V14_2", "V15_2", 
+                                                       "V16_2", "V17_2", "V18_2", 
+                                                       "V19_2",  "V20_2", "V21_2", 
+                                                       "V22_2", "V36_2", "V37_2", 
+                                                       "V38_2",  "V39_2", "V40_2", 
+                                                       "V41_2",  "V42_2", "V43_2", 
+                                                       "V44_2", "V24_2", "V66_2",
+                                                       "V82_2","V83_2","V148_2","V149_2",
+                                                       "V150_2", "V151_2","V176_5", "V177_5",
+                                                       "V178_5","V179_5","V180_5","V187_2","V243_2",
+                                                       "V244_2","V245_2", "V246_2")])
+                                         
+                                    
+WVS_Data_Precentages5 <- WVS_Data_Precentages4[,!colnames(WVS_Data_Precentages4) %in% BinaryQuestions_RemoveVarible] 
+```
+
+##Analyzing the Characteristics of the Dummy Variables: Normality Test
+Multivariate Normality - requires variables to be independent
+https://cran.r-project.org/web/packages/MVN/vignettes/MVN.pdf
+```{r Normality Test}
+#install.packages("nortest")
+library("nortest")
+
+normality_test <- apply(WVS_Data_Precentages5, 2, ad.test)
+
+#Need to determine which variables have significant p-values
+normality_p.values <- c()
+variable_names <- colnames(WVS_Data_Precentages5)
+
+for(col in c(1:791)){
+  variable_normality <- normality_test[[col]]
+  p.value <- variable_normality$p.value
+  normality_p.values <- cbind(normality_p.values, p.value)
+}
+
+colnames(normality_p.values) <-variable_names
+
+#p-values less than 0.05 mean the variables are non-normal
+nonnormal_variables <- t(normality_p.values)
+nonnormal_variables[nonnormal_variables > 0.01] = NA
+nonnormal_variables <- as.data.frame(t(na.omit(nonnormal_variables)))
+
+normal_variables <- t(normality_p.values)
+normal_variables[normal_variables < 0.01] = NA
+normal_variables <- as.data.frame(t(na.omit(normal_variables)))
+```
+315 of the 791 varaiables are not normal according to the Anderson-Darling test of normality with a p-value of 0.0, leaving 476 normal variables.
+
+##Analyzing the Characteristics of the National Precentage Variables: Intercorrelation between Variables
+Let's take a look into how the variables are related - these relationships are a combination of lantent varaiables and the fact that they are dummy variables.
+```{r Correlation Between Variables}
+library(corrplot)
+corrplot(cor(as.matrix(WVS_Data_Precentages5[,1:50])))
+corrplot(cor(as.matrix(WVS_Data_Precentages5[,51:100])))
+corrplot(cor(as.matrix(WVS_Data_Precentages5[,101:150])))
+corrplot(cor(V136_Count))
+```
+From this plot we can tell that the variables are strongly correlated with other variables from the same questions. This makes logical sense due to the way the dummy variables were created (i.e. porportion of the people from each country that answered that category). All the dummy variables for a single questions will sum to 100.
+
+#Cluster Analysis
+A simple way to see if variables are able to be dimensionally reduced is to perform a cluster analysis which analyses the points in space to determine which ones are "close" to each other.
+```{r Cluster Analysis}
+d <- dist(t(WVS_Data_Precentages5), method = "euclidean") # distance matrix
+fit <- hclust(d, method="ward.D") 
+plot(fit) # display dendogram
+# draw dendogram with red borders around the 5 clusters 
+rect.hclust(fit, k=5, border="red")
+cluster_groups <- as.data.frame(cutree(fit, k=5)) # cut tree into 5 clusters
+```
+From this cluster analysis we should expect the varaibles to group into approximately 5 dimensions. The cluster_groups dataframe shows which questions were grouped together. For example you can see that variables V4_1 and V8_1 are similar. This means that countries who consider family as "very important" also tend to consider work as "very important."
+
+#Prinicple Component Analysis
+The goal of principle component analysis is to reduce a set of correlated variables to a smaller number of uncorrelated varaibles. The goal is create a new set of varaibles that accounts for as much variability as possible. These principle components are linear combinations of the previous variables.Therefore, each component has a loading from the variables it is made up of.  
+
+When running a principle component analysis, either the correlation or covariance matrix can be used. the correlation matrix is primarily used when the data is on different scales. Since all the data is on a 0 to 100 scale, either correlation or covariance can be used. However, there must be more observations than variables to use the princomp function of R. Since our dataframe has more variables than observations, we sue the prcomp function which uses singular value decomposition to determine the components.
+
+More details: 
+http://www.sthda.com/english/wiki/principal-component-analysis-in-r-prcomp-vs-princomp-r-software-and-data-mining
+
+##Data for PCA
+In order to run a PCA we need to insure that that there is not a colinearity (i.e. variables adding to 100%). Thus we use WVS_Data_Precentages4 instead of WVS_Data_Precentages5 because we don't want to remove the binary questions completely. Therefore, we removed the 1st answer category from each variables, which means the only the negative repsonses to the two category questions are included. 
+```{r Data for PCA1 616 Variables}
+#Now that we have to remove our reference category before running the PCA. 
+WVS_Data_Precentages6<- WVS_Data_Precentages4[, -grep("Ref", colnames(WVS_Data_Precentages4))]
+```
+
+```{r PCA1 Analysis}
+PCA_Analysis_Data <- WVS_Data_Precentages6
+PCA_Analysis <-prcomp(PCA_Analysis_Data, center= TRUE, scale. = TRUE)
+summary(PCA_Analysis)
+```
+
+```{r PCA1 Scree Plot}
+plot(PCA_Analysis, main = "ScreePlot", type = "l")
+abline(h=25, col="red")
+```
+From this plot, there are 5 dimensions that can be extracted, as seen by when the line begins to level. 
+
+#PCA Result Analysis
+```{r PCA1 Scores}
+#Scores have countries as rows
+PCA_Scores <- PCA_Analysis$x[,c(1:5)]
+rownames(PCA_Scores) <- rownames(PCA_Analysis_Data)
+head(PCA_Scores)
+
+Named_PCA_Analysis_Data <- merge(Country_Names, PCA_Scores, by.y= 0, by.x ="Country.Code", all.y=T)
+#write.csv(Named_PCA_Analysis_Data, "PCA1_Scores.csv")
+```
+
+```{r PCA1 Loadings}
+#Loadings have variables as rows and factors as columns. These loadings are unrotated.
+PCA_Loadings <- round(PCA_Analysis$rotation [,c(1:5)], 3)
+PCA_Loadings <- as.data.frame(PCA_Loadings)
+
+#Plots of Components
+#pdf("Loading distribution.pdf", paper = "USr")
+par(mfrow=c(2,3))
+
+plot(PCA_Loadings$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.5, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+
+```{r PCA1 Rotations}
+#install.packages("GPArotation")
+library(GPArotation)
+
+plot(PCA_Loadings[,c(1:2)], xlim = c(-0.2, 0.2), ylim = c(-0.2, 0.2), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(varimax(PCA_Analysis$rotation [,c(1:2)])$loadings, xlim = c(-0.2, 0.2), ylim = c(-0.2, 0.2), main = "Varimax Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(oblimin(PCA_Analysis$rotation [,c(1:2)])$loadings, xlim = c(-0.2, 0.2), ylim = c(-0.2, 0.2), main = "Oblimin Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+#the points in the graph represent how each variable weighs on the first two dimensions. The two clusters indicated that there are two groups of variables that load in similar ways on to these components.
+```
+
+```{r PCA1 Factor Map}
+#install.packages("FactoMineR")
+library(FactoMineR)
+PCA(WVS_Data_Precentages6)
+```
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Furthermore, each variable much be interpreted with respect to the reference variable that was removed (as in done in tradition regression literature when a variable has to be removed to avoid collinearity.) Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r Cleaned PCA1 Loadings}
+PCA_Loadings[abs(PCA_Loadings) < 0.4] = NA
+PCA_Loadings_Cleaned1 <- PCA_Loadings[rowSums(is.na(PCA_Loadings))!= 5, ]
+head(PCA_Loadings_Cleaned1)
+```
+
+
+#Varaible Reduction 
+
+## Varaible Reduction: Chi-Square Test
+To reduce the amount of noise in the PCA analysis, we can remove questions that do not significantly vary with country. We use a chi-square significance test on the contingency tables that we created when counting the number of responses for each dummy variable by country. A chi-square significance test determines if two categorical variables have a significant association with one another. For p-values less than 0.05, we fail to reject the null hypothesis, implying that the variables are significantly  related to each other. In this project, we are comparing the questions variables (separately) to the country variable. 
+
+(More Information on Chi-sure:http://sites.stat.psu.edu/~ajw13/stat200_notes/12_assoc/10_assoc_print.htm)
+```{r Chi Square Test, warning=FALSE}
+#Create a list of the dataframes that must run chi-square test on. 
+#NOTE: Chi-square will not work on variables which contain zeros so those must be removed before running test.
+
+Cat_Questions_CountDF<- list(V4_Count=V4_Count,V5_Count=V5_Count,V6_Count=V6_Count,V7_Count=V7_Count,
+                             V8_Count=V8_Count,V9_Count=V9_Count,V10_Count=V10_Count,V11_Count=V11_Count,
+                             V12_Count=V12_Count,V13_Count=V13_Count,V14_Count=V14_Count,V15_Count=V15_Count,
+                             V16_Count=V16_Count,V17_Count=V17_Count,V18_Count=V18_Count,V19_Count=V19_Count,
+                             V20_Count=V20_Count,V21_Count=V21_Count,V22_Count=V22_Count,V25_Count=V25_Count,
+                             V26_Count=V26_Count,V27_Count=V27_Count,V28_Count=V28_Count,V29_Count=V29_Count,
+                             V30_Count=V30_Count,V31_Count=V31_Count,V32_Count=V32_Count,V33_Count=V33_Count,
+                             V34_Count=V34_Count,V35_Count=V35_Count,V37_Count=V37_Count,V42_Count=V42_Count,
+                             V39_Count=V39_Count,V38_Count=V38_Count,V36_Count=V36_Count,V40_Count=V40_Count,
+                             V41_Count=V41_Count,V43_Count=V43_Count,V44_Count=V44_Count,V24_Count=V24_Count,
+                             V70_Count=V70_Count,V71_Count=V71_Count,V72_Count=V72_Count,V73_Count=V73_Count,
+                             V75_Count=V75_Count,V76_Count=V76_Count,V77_Count=V77_Count,V78_Count=V78_Count,
+                             V79_Count=V79_Count,V74_Count=V74_Count,V165_Count=V165_Count,V166_Count=V166_Count,
+                             V167_Count=V167_Count,V168_Count=V168_Count,V169_Count=V169_Count,
+                             V81_Count=V81_Count,V82_Count=V82_Count,V83_Count=V83_Count,V45_Count=V45_Count,
+                             V46_Count=V46_Count,V102_Count=V102_Count,V49_Count=V49_Count,V54_Count=V54_Count,
+                             V51_Count=V51_Count,V52_Count=V52_Count,V50_Count=V50_Count,V48_Count=V48_Count,
+                             V47_Count=V47_Count,V53_Count=V53_Count,V60_Count=V60_Count,V61_Count=V61_Count,
+                             V62_Count=V62_Count,V63_Count=V63_Count,V64_Count=V64_Count,V65_Count=V65_Count,
+                             V66_Count=V66_Count,V67_Count=V67_Count,V68_Count=V68_Count,V69_Count=V69_Count,
+                             V80_Count=V80_Count,V84_Count=V84_Count,V85_Count=V85_Count,V86_Count=V86_Count,
+                             V87_Count=V87_Count,V88_Count=V88_Count,V89_Count=V89_Count,V108_Count=V108_Count,
+                             V109_Count=V109_Count,V110_Count=V110_Count,V111_Count=V111_Count,V112_Count=V112_Count,
+                             V113_Count=V113_Count,V114_Count=V114_Count,V115_Count=V115_Count,V116_Count=V116_Count,
+                             V117_Count=V117_Count,V118_Count=V118_Count,V119_Count=V119_Count,V120_Count=V120_Count,
+                             V121_Count=V121_Count,V122_Count=V122_Count,V123_Count=V123_Count,V124_Count=V124_Count,
+                             V126_Count=V126_Count,V127_Count=V127_Count,V128_Count=V128_Count,V129_Count=V129_Count,
+                             V130_Count=V130_Count,V142_Count=V142_Count,V217_Count=V217_Count,V218_Count=V218_Count,
+                             V219_Count=V219_Count,V220_Count=V220_Count,V221_Count=V221_Count,V222_Count=V222_Count,
+                             V223_Count=V223_Count,V224_Count=V224_Count,V225_Count=V225_Count,V226_Count=V226_Count,
+                             V227_Count=V227_Count,V143_Count=V143_Count,V145_Count=V145_Count,V146_Count=V146_Count,
+                             V147_Count=V147_Count,V148_Count=V148_Count,V149_Count=V149_Count,V150_Count=V150_Count,
+                             V151_Count=V151_Count,V153_Count=V153_Count,V154_Count=V154_Count,V155_Count=V155_Count,
+                             V156_Count=V156_Count,V211_Count=V211_Count,V103_Count=V103_Count,V104_Count=V104_Count,
+                             V105_Count=V105_Count,
+                             V106_Count=V106_Count,V107_Count=V107_Count,V212_Count=V212_Count,V213_Count=V213_Count,
+                             V214_Count=V214_Count,V216_Count=V216_Count,V243_Count=V243_Count,V244_Count=V244_Count,
+                             V245_Count=V245_Count,V246_Count=V246_Count,V170_Count=V170_Count,V171_Count=V171_Count,
+                             V172_Count=V172_Count,V173_Count=V173_Count,V174_Count=V174_Count,V175_Count=V175_Count,
+                             V176_Count=V176_Count,V177_Count=V177_Count,V178_Count=V178_Count,V179_Count=V179_Count,
+                             V180_Count=V180_Count,V181_Count=V181_Count,V182_Count=V182_Count,V183_Count=V183_Count,
+                             V184_Count=V184_Count,V185_Count=V185_Count,V186_Count=V186_Count,V187_Count=V187_Count,
+                             V188_Count=V188_Count,V189_Count=V189_Count,V190_Count=V190_Count,V191_Count=V191_Count)
+
+Chisq_Signifance_Categorical <- c()
+for (DF in Cat_Questions_CountDF){
+  DF <- na.omit(DF)
+  DF <- DF[,-(which(colSums(DF) == 0))] 
+  Chisq_Signifance_Test <- chisq.test(DF, simulate.p.value = TRUE, B = 10000)
+  Chisq_Signifance_Categorical <- rbind(Chisq_Signifance_Categorical, Chisq_Signifance_Test$p.value)
+  }
+
+#For the ordinal questions used the grouped varaibles, which are precentages - need to create new count tables that are grouped together by the categories - very low, low, medium, high, and very high
+
+Ordinal_df_Count<- list(V23_Count,V56_Count,V55_Count,V157_Count,V158_Count,
+                        V159_Count,V160_Count,V164_Count,V59_Count,V95_Count,
+                        V96_Count,V97_Count,V98_Count,V99_Count,V100_Count,
+                        V101_Count,V131_Count,V132_Count,V134_Count,V135_Count,
+                        V136_Count,V137_Count,V138_Count,V141_Count,V192_Count,
+                        V194_Count,V197_Count,V198_Count,V200_Count,V209_Count,
+                        V210_Count,V199_Count,V201_Count,V202_Count,V203_Count,
+                        V204_Count,V205_Count,V207_Count,V206_Count,V208_Count,
+                        V195_Count, V196_Count)
+
+Ordinal_Question_Column_Names<- c("V23","V56",'V55', 'V157',
+                                'V158','V159','V159','V164',
+                                'V59','V95','V96','V97',
+                                'V98','V99','V100','V101',
+                                'V131','V132','V134','V135',
+                                'V136',"V137","V138", "V141",
+                                'V192','V194','V197','V198','V200','V209',
+                                'V210','V199','V201','V202','V203',
+                                'V204','V205','V207', 'V206','V208',
+                                "V195", "V196")
+count = 1
+Ordinal_Question_Category_Count =c() #List to name the category dataframes
+
+for(i in 1:42){ 
+  Question_Name <- paste(Ordinal_Question_Column_Names[i], "Category_Count", sep = "_")
+  Ordinal_Question_Category_Count <- c(Ordinal_Question_Category_Count, Question_Name)
+}
+
+for(df in Ordinal_df_Count){
+  VLow<-as.data.frame(apply(df[,c(1:2)],1,sumNA))
+  Low<-as.data.frame(apply(df[,c(3:4)],1,sumNA))
+  Med<-as.data.frame(apply(df[,c(5:6)],1,sumNA))
+  High<-as.data.frame(apply(df[,c(7:8)],1,sumNA))
+  VHigh<-as.data.frame(apply(df[,c(9:10)],1,sumNA))
+
+Categorized <-cbind(VLow, Low, Med, High, VHigh)
+colnames(Categorized) <- c("Very Low_Ref", "Low", "Med", "High", " Very High")
+colnames(Categorized) <- paste(Ordinal_Question_Column_Names[count], colnames(Categorized), sep = "_")
+assign(Ordinal_Question_Category_Count[count], Categorized)
+count=count+1
+}
+
+#VLow_V161 <-V161_Counts[,1]
+Low_V161 <- as.data.frame(apply(V161_Counts[,c(1:2)],1,sumNA))
+Med_V161 <-V161_Counts[,3]
+High_V161 <-as.data.frame(apply(V161_Counts[,c(4:5)],1,sumNA))
+#VHigh_V161 <-V161_Counts[,5]
+
+
+V161_Categorized_Count <-cbind(Low_V161, Med_V161, High_V161)
+colnames(V161_Categorized) <- c("V161_Low_Ref", "V161_Med", "V161_High")
+
+#VLow_V162 <-V162_Counts[,1]
+Low_V162 <- as.data.frame(apply(V162_Counts[,c(1:2)],1,sumNA))
+Med_V162 <-V162_Counts[,3]
+High_V162 <-as.data.frame(apply(V162_Counts[,c(4:5)],1,sumNA))
+#VHigh_V162 <-V162_Counts[,5]
+
+
+V162_Categorized_Count <-cbind(Low_V162, Med_V162, High_V162)
+colnames(V161_Categorized) <- c("V162_Low_Ref", "V162_Med", "V162_High")
+
+#VLow_V163 <-V163_Counts[,1]
+Low_V163 <- as.data.frame(apply(V163_Counts[,c(1:2)],1,sumNA))
+Med_V163 <-V163_Counts[,3]
+High_V163 <-as.data.frame(apply(V163_Counts[,c(4:5)],1,sumNA))
+#VHigh_V163 <-V163_Counts[,5]
+
+
+V163_Categorized_Count <-cbind(Low_V163, Med_V163, High_V163)
+colnames(V163_Categorized) <- c("V163_Low_Ref", "V163_Med", "V163_High")
+
+Ordinal_Question_CountDF<- list(V23_Category_Count=V23_Category_Count,V56_Category_Count=V56_Category_Count,
+                                V55_Category_Count=V55_Category_Count, V157_Category_Count=V157_Category_Count,
+                                V158_Category_Count=V158_Category_Count,V159_Category_Count=V159_Category_Count,
+                                V159_Category_Count=V159_Category_Count,V164_Category_Count=V164_Category_Count,
+                                V59_Category_Count=V59_Category_Count,V95_Category_Count=V95_Category_Count,
+                                V96_Category_Count=V96_Category_Count,V97_Category_Count=V97_Category_Count,
+                                V98_Category_Count=V98_Category_Count,V99_Category_Count=V99_Category_Count,
+                                V100_Category_Count=V100_Category_Count,V101_Category_Count=V101_Category_Count,
+                                V131_Category_Count=V131_Category_Count,V132_Category_Count=V132_Category_Count,
+                                V134_Category_Count=V134_Category_Count,V135_Category_Count=V135_Category_Count,
+                                V136_Category_Count=V136_Category_Count,V137_Category_Count=V137_Category_Count,
+                                V138_Category_Count=V138_Category_Count,V141_Category_Count=V141_Category_Count,
+                                V192_Category_Count=V192_Category_Count,V194_Category_Count=V194_Category_Count,
+                                V197_Category_Count=V197_Category_Count,V198_Category_Count=V198_Category_Count,
+                                V200_Category_Count=V200_Category_Count,V209_Category_Count=V209_Category_Count,
+                                V210_Category_Count=V210_Category_Count,V199_Category_Count=V199_Category_Count,
+                                V201_Category_Count=V201_Category_Count,V202_Category_Count=V202_Category_Count,
+                                V203_Category_Count=V203_Category_Count,V204_Category_Count=V204_Category_Count,
+                                V205_Category_Count=V205_Category_Count,V207_Category_Count=V207_Category_Count, 
+                                V206_Category_Count=V206_Category_Count,V208_Category_Count=V208_Category_Count,
+                                V195_Category_Count=V195_Category_Count, V196_Category_Count=V196_Category_Count,
+                                V161_Categorized_Count=V161_Categorized_Count[,c(1:3)],
+                                V162_Categorized_Count=V162_Categorized_Count[,c(1:3)],
+                                V163_Categorized_Count=V163_Categorized_Count[,c(1:3)])
+
+Chisq_Signifance_Ordinal <- c()
+for (DF in Ordinal_Question_CountDF){
+  Chisq_Signifance_Test <- chisq.test(DF, simulate.p.value = TRUE, B = 10000)
+  Chisq_Signifance_Ordinal <- rbind(Chisq_Signifance_Ordinal, Chisq_Signifance_Test$p.value)
+}
+
+dim(Chisq_Signifance_Categorical)
+dim(Chisq_Signifance_Ordinal)
+#All the questions are signifinicantly impacted by the country according to the chi-sqare test of significance.
+```
+
+##Varaible Reduction: PCA on Question's Precentage Dataframe
+In order to reduce the number of variables going to into the PCA, we could reduce the dummy variables into dummy dimensions by conducting a PCA on the percentage data frames. This will create one dimension for each questions representing all the dummy variables.
+```{r PCA2 Variable Reduction with Question Dimensions}
+PCA2a_Scores <- c()
+
+for (DF in Cat_Questions_CountDF){
+  PCA_DF <- prcomp(DF)
+  PCA2a_Scores_DF <- PCA_DF$x[,1]
+  PCA2a_Scores <- cbind(PCA2a_Scores, PCA2a_Scores_DF)
+}
+
+for (DF in Ordinal_Question_CountDF){
+  PCA_DF <- prcomp(DF)
+  PCA2a_Scores_DF <- PCA_DF$x[,1]
+  PCA2a_Scores <- cbind(PCA2a_Scores, PCA2a_Scores_DF)
+}
+
+PCA2a_colnames <- c('V4','V5','V6','V7','V8','V9','V10','V11','V12','V13','V14','V15','V16',
+                   'V17','V18','V19','V20','V21',
+                   'V22','V25','V26','V27','V28','V29','V30','V31','V32','V33','V34','V35',
+                   'V37','V42','V39','V38','V36',
+                   'V40','V41','V43','V44','V24','V70','V71','V72','V73','V75','V76','V77',
+                   'V78','V79','V74','V165',
+                   'V166','V167','V168','V169','V81','V82','V83','V45','V46',
+                   'V102','V49','V54','V51','V52','V50',
+                   'V48','V47','V53','V60','V61','V62','V63','V64','V65','V66','V67','V68',
+                   'V69','V80','V84','V85',
+                   'V86','V87','V88','V89','V108','V109','V110','V111','V112','V113','V114',
+                   'V115','V116','V117',
+                   'V118','V119','V120','V121','V122','V123','V124','V126','V127','V128','V129','V130','V142','V217',
+                   'V218','V219','V220','V221','V222','V223','V224','V225','V226','V227','V143','V145','V146','V147',
+                   'V148','V149','V150','V151','V153','V154','V155','V156','V211','V103','V104',"V105",'V106','V107','V212',
+                   'V213','V214','V216','V243','V244','V245','V246','V170','V171','V172','V173','V174','V175','V176',
+                   'V177','V178','V179','V180','V181','V182','V183','V184','V185','V186','V187','V188','V189','V190',
+                   'V191',
+                   'V23_Category','V56_Category','V55_Category','V157_Category','V158_Category','V159_Category',
+                   'V160_Category','V164_Category','V59_Category','V95_Category','V96_Category','V97_Category',
+                   'V98_Category','V99_Category','V100_Category','V101_Category','V131_Category','V132_Category',
+                   'V134_Category','V135_Category','V136_Category','V137_Category','V138_Category',
+                   'V141_Category','V192_Category','V194_Category',
+                   'V197_Category','V198_Category','V200_Category','V209_Category',
+                   'V210_Category','V199_Category','V201_Category','V202_Category','V203_Category',
+                   'V204_Category','V205_Category','V207_Category', 'V206_Category','V208_Category',
+                   'V195_Category',"V196_Cateogry",
+                   'V161_Categorized', 'V162_Categorized', 'V163_Categorized')
+
+colnames(PCA2a_Scores) <- PCA2a_colnames
+
+PCA_2b <- prcomp(PCA2a_Scores, center= TRUE, scale. = TRUE)
+summary(PCA_2b)
+```
+
+```{r PCA2 Scree Plot}
+plot(PCA_2b, type = "l")
+```
+
+```{r PCA2 Loadings}
+#Loadings have variables as rows
+PCA_Loadings2 <- round(PCA_2b$rotation [,c(1:5)], 3)
+head(PCA_Loadings2)
+PCA_Loadings2 <- as.data.frame(PCA_Loadings2)
+
+
+#Plots of Components
+#pdf("Loading distribution2.pdf", paper = "USr")
+par(mfrow=c(2,3))
+
+plot(PCA_Loadings2$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings2$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings2$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings2$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings2$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+
+```{r PCA2 Rotations}
+PCA_2.Varimax <-varimax(PCA_2b$rotation)
+
+plot(PCA_2b$rotation [,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(varimax(PCA_2b$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(oblimin(PCA_2b$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Oblimin Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+```{r PCA2 Variable Factor Map}
+PCA(PCA2a_Scores)
+```
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Furthermore, each variable much be interpreted with respect to the fact that it is a dimension itself based on the orginal variables and representing some proportion of the original data. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA2 Cleaning out values smaller than 0.1}
+PCA_Loadings2[abs(PCA_Loadings2) < 0.1] = NA
+PCA_Loadings_Cleaned2 <- PCA_Loadings2[rowSums(is.na(PCA_Loadings2))!= 5, ]
+head(PCA_Loadings_Cleaned2)
+
+PCA_Scores2 <- PCA_2b$x[,c(1:5)]
+Named_PCA_Analysis_Data2 <- merge(Country_Names, PCA_Scores2, by.y= 0, by.x ="Country.Code", all.y=T)
+```
+
+##Varaible Reduction:Low Variance Filter
+Sometimes variables are removed because they have low variance. Removing these variables will help to reduce the noise in the results of the PCA analysis. 
+```{r PCA3 Low Variance Filter}
+#Removing variables with less than 20% of maximum varaince.
+High_Variance_Variables <- subset(Variance_Sorted, Variance_Sorted[,1] >= ((0.2)*max(Variance_Sorted[,1])))
+
+WVS_Data_Precentages5_Inverse <- t(WVS_Data_Precentages5)
+High_Variance_Variables_Responses <- merge(High_Variance_Variables, WVS_Data_Precentages5_Inverse, by.x=0, by.y=0)
+rownames(High_Variance_Variables_Responses) <- High_Variance_Variables_Responses$Row.names
+High_Variance_Variables_Responses <- High_Variance_Variables_Responses[ ,c(3:58)]
+High_Variance_Variables_Responses <- t(High_Variance_Variables_Responses)
+
+#Now that we could to remove our reference category before running the PCA - however no questions retained all dummy variables after low variability dummy variables were removed therefore we did not remove the dummy variables.
+WVS_Data_Precentages7<- High_Variance_Variables_Responses[, -grep("Ref", colnames(High_Variance_Variables_Responses))]
+
+#This reduces are variables to 131 from the 617 that we started with 
+High_Variance_Variables_Responses_Names <- as.data.frame(colnames(High_Variance_Variables_Responses))
+
+PCA_3 <- prcomp(High_Variance_Variables_Responses, center= TRUE, scale. = TRUE)
+summary(PCA_3)
+```
+
+
+```{r pCA3 Scree Plot}
+plot(PCA_3, type = "l")
+abline(h=5, col="red")
+```
+
+
+```{r PCA3 Variables Factor Map}
+PCA(High_Variance_Variables_Responses)
+```
+
+```{r PCA3 Loadings}
+#Loadings have variables as rows
+PCA_Loadings3 <- round(PCA_3$rotation [,c(1:5)], 3)
+head(PCA_Loadings3)
+PCA_Loadings3 <- as.data.frame(PCA_Loadings3)
+
+#Plots of Components
+#pdf("Loading distribution3.pdf", paper = "USr")
+par(mfrow=c(2,3))
+
+plot(PCA_Loadings3$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings3$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings3$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings3$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings3$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+```{r PCA3 Rotations}
+plot(PCA_3$rotation [,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(varimax(PCA_3$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(oblimin(PCA_3$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Oblimin Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA3 Loadings and Scores}
+PCA_Loadings3[abs(PCA_Loadings3) < 0.4] = NA
+PCA_Loadings_Cleaned3 <- PCA_Loadings3[rowSums(is.na(PCA_Loadings3))!= 5, ]
+head(PCA_Loadings3)
+
+PCA_Scores3 <- PCA_3$x[,c(1:5)]
+```
+
+##Varaible Reduction:Low Variance Filter - 1 Variable Per Questions with Highest Variance
+We also tried selecting only one variable per question. We did this by selecting the variable with the highest variance within the question. The PCA results are not clear so we don't continue with a regression analysis.
+```{r 1 Variable Per Questions with Highest Variance}
+High_Variance_Question <- c()
+for (DF in Cat_Question_Count){
+  #DF <- na.omit(DF)
+  DF <- DF[,c(1:9)]
+  DF <- DF[,-(which(colSums(DF) == 0))] 
+  Question_Variance <- apply(DF, 2, var)
+  High_Variance_Variable <-names(which.max(Question_Variance))
+  High_Variance_Question <- rbind(High_Variance_Question, High_Variance_Variable)
+  }
+
+#Take out the 5 Point Categories beause they are a different size
+Ordinal_Question_DF <- list(V23_Category,
+                                   V56_Category,V55_Category,V157_Category,V158_Category,V159_Category,
+                                   V160_Category,V164_Category,V59_Category,V95_Category,V96_Category,V97_Category,
+                                   V98_Category,V99_Category,V100_Category,V101_Category,V131_Category,V132_Category,
+                                   V134_Category,V135_Category,V136_Category,V137_Category,V138_Category,
+                                   V141_Category,V192_Category,V194_Category,
+                                   V197_Category,V198_Category,V200_Category,V209_Category,
+                                   V210_Category,V199_Category,V201_Category,V202_Category,V203_Category,
+                                   V204_Category,V205_Category,V207_Category, V206_Category,V208_Category,
+                                   V195_Category,V196_Category)
+
+for (DF in Ordinal_Question_DF){
+  #DF <- na.omit(DF)
+  DF <- DF[,c(1:5)]
+  #DF <- DF[,-(which(colSums(DF) == 0))] 
+  Question_Variance <- apply(DF, 2, var)
+  High_Variance_Variable <-names(which.max(Question_Variance))
+  High_Variance_Question <- rbind(High_Variance_Question, High_Variance_Variable)
+  }
+
+FivePt_Likert <- apply(PFL_5Scale_Cat[c(1:3,7:9,13:15)],2,var)
+
+High_Variance_Question <- rbind(High_Variance_Question, "V161_Med", "V162_High", "V163_High")
+
+#these are the variables to analyze. USE WVS4 - because either the yes or the no variable could have been chosen
+
+PCA4_Data <- WVS_Data_Precentages4[,High_Variance_Question]
+
+PCA4 <- prcomp(PCA4_Data, center = TRUE, scale. = TRUE)
+summary(PCA4)
+```
+
+```{r PCA4 Variable Factor Plot}
+PCA(PCA4_Data)
+```
+
+```{r PCA4 Scree Plot}
+plot(PCA7, type = "l")
+abline(h=3000, col="red")
+```
+
+```{r PCA4 Loadings}
+#Loadings have variables as rows
+PCA_Loadings4 <- round(PCA4$rotation [,c(1:5)], 3)
+head(PCA_Loadings7)
+PCA_Loadings4 <- as.data.frame(PCA_Loadings4)
+
+par(mfrow=c(2,3))
+
+plot(PCA_Loadings4$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings4$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings4$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings4$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings4$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+
+```{r PCA4 Rotations}
+plot(PCA4$rotation [,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(varimax(PCA4$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(oblimin(PCA4$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Oblimin Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA4 Loadings and Scores}
+PCA_Loadings4[abs(PCA_Loadings4) < 0.4] = NA
+PCA_Loadings_Cleaned4 <- PCA_Loadings4[rowSums(is.na(PCA_Loadings4))!= 5, ]
+head(PCA_Loadings4)
+
+PCA_Scores4 <- PCA4$x[,c(1:5)]
+head(PCA_Scores4)
+```
+
+#Varaible Reduction: Non-Parametric Rank Correlations
+When Hofstede developed his cultural model and dimesnsions he used the Spearman rank correlations to determine which variables to analyze further. For example for the construction of the power distance index, Hofstede choose one question (measured on a likert scale), theorhetically and then looked for other varaibles (likert or porportions) which had strong (over 0.5), signifiant relationships with the orginal questions. He then retained the conceptually related varaibles which had the strongest most signifcant relationship to that orginial question. The final PDI index is based on three vairables.
+
+In this study, we are aiming to avoid using theorhetical elimination of questions; therefore we looked at the Spearman and Kendall correlations between the variables. We are specifically interested in if the variables have a significant relationship with variables outside it's own question. In the code we calculated the Spearman coefficients. We did not use the pearson correlation corefficients because the variables are not normally distributted. 
+
+##Varaible Reduction: Spearman Rank Correlations
+```{r Spearman Rank Correlations, warning=FALSE}
+Spearman_Correlations <- cor(WVS_Data_Precentages5, method = "spearman")
+Spearman_Correlations <- as.data.frame(Spearman_Correlations)
+Spearman_Correlations[abs(Spearman_Correlations) < 0.7] = NA
+
+#remove columns/rows which sum to 1 - because that implies that only correlate with themselves at 0.7 or higher
+Spearman_Correlations_NoCorr<- Spearman_Correlations[,-(which(colSums(Spearman_Correlations, na.rm=TRUE) == 1.00))] 
+
+#the list below is the variables to keep
+Correlated_Variables <- names(Spearman_Correlations_NoCorr)
+
+#There are 180 varaibles that do not correlate with anything else. They should be removed from the analysis. 
+ Spearman_Correlations_0.7Corr<- Spearman_Correlations[Correlated_Variables, Correlated_Variables]
+
+ #However, this still leaves 617 variables - which when looking at some of the correlations, not all of them make sense. This can be attributed to how the Spearman test manages ties in the data. When there is a tie the assigned rank is the average of their values in the separate lists.
+ str(Correlated_Variables)
+ 
+ Eliminate_Spearman <- c("V4_", "V4_","V5_","V5_","V5_","V6_","V6_",
+                        "V6_","V7_","V7_","V7_","V7_","V8_","V8_","V8_",
+                        "V9_","V9_","V9_","V10_","V10_","V10_","V10_",
+                        "V11_","V11_","V19_","V25_","V25_","V25_",
+                        "V26_","V26_","V26_","V27_","V27_","V27_",
+                        "V28_","V28_","V28_","V29_","V29_","V29_",
+                        "V30_","V30_","V30_","V31_","V31_","V31_",
+                        "V32_","V32_","V32_2","V33_","V33_","V33_","V34_",
+                        "V34_","V34_","V35_","V35_","V35_","V37_","V42_",
+                        "V39_","V38_", "V36_","V40_","V41_","V43_","V44_",
+                        "V24_","V70_","V70_","V70_","V71_","V71_","V71_",
+                        "V71_","V71_","V71_","V72_","V72_","V72_","V72_",
+                        "V72_","V73_","V73_","V73_","V73_","V73_",
+                        "V75_","V75_","V75_","V75_","V75_","V76_",
+                        "V76_","V76_","V76_","V76_","V76_","V77_","V77_",
+                        "V77_","V77_","V77_","V78_","V78_","V78_",
+                        "V78_","V78_","V78_","V79_","V79_","V79_","V79_",
+                        "V79_","V79_","V74_","V74_","V74_","V74_","V74_",
+              "V165_","V165_","V166_","V166_","V166_","V167_","V168_","V168_","V168_","V168_",
+              "V169_","V169_","V169_","V82_","V45_","V45_","V45_","V46_","V102_","V102_",
+              "V102_","V102_","V49_","V49_","V49_","V49_4","V54_","V54_2","V54_3","V54_4",
+              "V51_","V51_","V51_","V51_","V52_","V52_2","V52_3","V52_4","V50_1","V50_3",
+              "V48_","V47_","V47_","V47_","V53_","V53_","V53_","V53_","V60_","V60_",
+              "V61_","V62_","V63_","V64_","V67_","V67_","V67_" ,"V68_","V68_","V69_","V69_","V69_",
+              "V84_","V84_","V85_","V85_" ,"V85_","V86_","V86_","V86_","V87_","V87_","V87_","V88_",
+              "V88_","V88_","V89_","V89_","V89_","V108_","V108_","V108_","V109_","V109_","V109_",
+              "V109_","V110_","V110_","V110_","V110_","V111_","V111_","V111_","V111_","V112_",
+              "V112_","V112_","V112_","V113_","V113_","V113_","V113_","V114_","V114_","V114_",
+              "V114_","V115_","V115_","V115_","V115_","V116_","V116_","V116_","V116_","V117_",
+              "V117_","V117_","V117_","V118_","V118_","V118_","V118_","V119_","V119_","V119_",
+              "V120_","V120_","V120_","V120_","V121_","V121_","V121_","V121_","V122_","V122_",
+              "V122_","V122_","V123_","V123_","V123_","V123_","V124_","V124_","V124_","V124_",
+              "V126_","V126_","V126_","V127_","V127_","V128_","V129_","V129_","V129_","V130_",
+              "V130_","V142_","V142_","V142_","V217_","V217_","V217_","V218_","V218_","V219_", 
+              "V219_","V219_","V220_","V220_","V221_","V221_","V221_","V222_","V222_","V222_",           
+              "V222_","V222_","V223_","V223_","V223_","V223_","V223_","V225_","V225_","V226_",
+              "V226_","V226_","V227_","V227_","V227_","V143_","V143_","V143_","V145_","V145_",
+              "V145_","V145_","V146_","V146_","V146_","V147_","V147_","V147_","V148_","V149_",
+              "V150_","V150_","V150_","V151_","V151_","V151_","V153_","V153_","V153_","V153_",
+              "V154_","V154_","V154_","V155_","V155_","V156_","V156_","V156_","V211_","V211_",
+              "V211_","V211_","V103_","V103_","V103_","V104_","V104_","V104_","V106_","V106_",
+              "V106_","V106_","V107_","V107_","V107_","V107_","V212_","V212_","V212_","V212_",
+              "V213_","V213_","V213_","V213_","V214_","V214_","V214_","V214_","V216_","V216_",
+              "V216_","V243_","V244_","V170_","V170_","V171_","V171_","V171_","V171_","V172_",
+              "V172_","V172_","V173_","V173_","V173_","V173_","V174_","V174_","V174_","V174_", 
+              "V175_","V175_","V175_","V175_","V176_","V177_","V179_","V180_","V181_","V181_",
+              "V181_","V181_","V182_","V182_","V182_","V182_","V183_","V183_","V183_","V183_",
+              "V184_","V184_","V184_","V184_","V185_","V185_","V185_","V185_","V186_","V186_",
+              "V188_","V188_","V188_","V188_","V189_","V189_","V189_","V189_","V190_","V190_",
+              "V190_","V190_","V191_","V191_","V191_","V191_","V23_","V23_","V23_","V23_",
+              "V23_","V56_","V56_","V55_","V55_","V55_","V55_","V55_","V157_","V157_",
+              "V158_","V158_","V158","V159_","V159_","V159_","V159_","V160_","V164_",
+              "V164_","V59_","V59_","V59_","V59_ ","V96_","V96_","V96_","V96_","V97_",
+              "V97_","V97_","V98_","V98_","V98_","V98_","V99_","V99_","V99_","V100_",
+              "V100_","V100_","V100_","V101_","V101_","V101_","V101_","V131_","V131_","V131_",
+              "V131_","V132_","V132_","V132_","V132_","V132_","V134_","V134_","V134_","V134_",
+              "V134_","V135_","V135_","V135_","V135_","V135_","V136_","V136_","V136_","V136_",
+              "V136_","V137_","V137_","V137_","V137_","V138_","V138_","V138_","V141_","V141_",         
+              "V141_","V141_","V192_","V192_","V192_","V194_","V194_","V194_","V194_","V194_",
+              "V197_","V197_","V197_",         
+              "V197_","V197_","V198_","V198_","V198_","V198_","V198_","V200_","V200_","V200_",         
+              "V200_","V200_","V209_","V209_","V209_","V209_","V209_","V210_","V210_","V210_",
+              "V210_","V210_","V199_","V199_","V199_","V199_","V199_","V201_","V201_","V201_",
+              "V201_","V201_","V202_","V202_","V202_","V202_","V202_","V203_","V203_","V203_",
+              "V203_","V203_","V204_","V204_","V204_","V204_","V205_","V205_","V205_","V205_",
+              "V207_","V207_","V207_","V207_","V207_","V206_","V206_","V206_","V208_","V208_",
+              "V208_","V208_","V208_",
+              "V195_","V195_","V195_","V195_","V196_","V196_","V196_","V196_", 
+              "V161_","V161_","V161_","V162_","V162_","V162_","V163_",
+              "V163_","V163_")
+Keep <- c()
+i=1
+for (aRow in Correlated_Variables[c(1:617)]){
+  DF <- abs(Spearman_Correlations_0.7Corr[ , -grep(Eliminate_Spearman[i], colnames(Spearman_Correlations_0.7Corr))])
+  sum <- sum((DF[aRow,]), na.rm=T)
+  if(sum>0){Keep <- cbind(Keep, aRow)} #if sum of row is greater than 0, keep the row.
+  #if(is.na(sum==T)){next}
+  i=i+1
+}
+Keep <- c(Keep[1,])
+str(Keep)
+
+#There are 180 varaibles that do not correlate with anything else and then we elimanted another 113 for only being correclated to other variables within the same question. They are removed from the analysis, leaving 504 variables. 
+WVS_Data_Precentages5_0.7Corr<- WVS_Data_Precentages5[,Keep]
+Spearman_Correlations_0.7Corr_Reduced<- Spearman_Correlations[Keep, Keep]
+
+#now we need ensure that all these correlations (outside the variable questions to one another) are significant
+Result <- c()
+Sig_Correlations <- c()
+
+#while we know that there are 503 variables which have correlations greater than 0.7 with variables outside their own question, we recreate the orginal dataframes from the last loop in order to do a significance test. 
+
+for(aRow in c(1:220)){
+  DF <- Spearman_Correlations_0.7Corr[ , -grep(Eliminate_Spearman[aRow], colnames(Spearman_Correlations_0.7Corr))]
+  Cell <- ncol(DF)
+  i=1
+#change this to referring to column/row name so that I make sure it's the right one. 
+  for(i in c(1:Cell)){ #looping through each one of the columns in DF
+    if (is.na(DF[aRow,i]) == FALSE) { #if the correlation exists, or the logical arguement is false, then run a correlation test)
+      j <- colnames(DF[i])
+      k <- rownames(DF[aRow,])
+      #performing a correlation test between a row and a column - need to make sure it doesn't compare to itself
+      Correlation_Test <- cor.test(WVS_Data_Precentages5[,k], WVS_Data_Precentages5[,j], method = "spearman")
+      P_Values <- Correlation_Test$p.value
+      R_squared <- DF[k,j]
+      Result <- cbind(rownames(DF[k,]), colnames(DF[j]), R_squared, P_Values)
+      Sig_Correlations <- rbind(Sig_Correlations, Result)
+    }
+    Result<- c()
+  }
+}
+
+dim(Sig_Correlations)
+
+#now we should delete any rows which have non-significant p-values
+Sig_Correlations_Clean <- Sig_Correlations[!(as.numeric(Sig_Correlations[,4]) > 0.05),]
+```
+
+```{r Spearman Correlation Variables}
+#Names of columns to keep in WVS_Data_Precentages5 to keep
+VariablestoKeep <- unique(c(Sig_Correlations_Clean[,1],Sig_Correlations_Clean[,2]))
+VariablestoKeep_DF <- as.data.frame(VariablestoKeep)
+str(VariablestoKeep)
+```
+
+282 variables have significante (>0.05) p-values for their correlations.  
+```{r Spearman Rank Corrleation PCA5}
+WVS_Data_Precentages5_Spearman <- WVS_Data_Precentages5[,VariablestoKeep]
+ 
+Spearman_PCA <- prcomp(WVS_Data_Precentages5_Spearman, center = TRUE, scale. = TRUE)
+summary(Spearman_PCA)
+```
+
+```{r PCA5 Scree Plot}
+plot(Spearman_PCA, type = "l")
+```
+
+```{r PCA5 Loadings}
+Spearman_PCA_Loadings <- Spearman_PCA$rotation[,c(1:5)]
+
+plot(Spearman_PCA_Loadings [,c(1,2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Reduced Spearman Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+```{r Spearman Rank Correlation PCA}
+PCA(WVS_Data_Precentages5_Spearman)
+```
+
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA5 Loadings and Scores}
+Spearman_PCA_Loadings [abs(Spearman_PCA_Loadings ) < 0.4] = NA
+PCA_Loadings_Cleaned5<- Spearman_PCA_Loadings [rowSums(is.na(Spearman_PCA_Loadings ))!= 5, ]
+head(PCA_Loadings_Cleaned5)
+
+PCA_Scores5 <- Spearman_PCA$x[,c(1:5)]
+```
+
+##Varaible Reduction: Kendall Rank Correlations
+The Kendall Rank correlation is based on discordant and concordant pairs and ties between the rankings result in a slightly different calculation of tau which is based on the difference between concordant and discordant pairs divided by the square root of the product of the difference between the unique ordered pairs and the tied rank in both set of variables. It is considered to be more resistant to error and better for smaller sample sizes. See article by Puth et al.
+```{r Kendall Rank Correlations}
+Kendall_Correlations <- cor(WVS_Data_Precentages5, method = "kendall")
+Kendall_Correlations <- as.data.frame(Kendall_Correlations)
+Kendall_Correlations[abs(Kendall_Correlations) < 0.7] = NA
+#write.csv(Kendall_Correlations, "Kendall_Correlations_0.7Cleaned.csv")
+
+#remove columns/rows which sum to 1 - because that implies that only correlate with themselves at 0.7 or higher
+Kendall_Correlations_NoCorr<- Kendall_Correlations[,-(which(colSums(Kendall_Correlations, na.rm=TRUE) == 1.00))] 
+
+#the list below is the variables to keep
+Correlated_Variables <- names(Kendall_Correlations_NoCorr)
+str(Correlated_Variables)
+
+#There are 573 varaibles that do not correlate with anything else above 0.7. They are removed from the analysis. 
+Kendall_Correlations_0.7Corr<- Kendall_Correlations[Correlated_Variables, Correlated_Variables]
+diag(Kendall_Correlations_0.7Corr) = NA
+
+#Now we want to only keep variables which have signifcant correlations beyond other variables in their question. We can do this by summing each row - excluding the variables related to the same question
+
+#For example if we sum the first row excluding the variable from V4
+sum(Kendall_Correlations_0.7Corr["V9_1_Ref",c(1:220)], na.rm=T)
+#For this  variable, this means that V9_1_Ref is correlated to something beyond other V9 questions because the sum is not zero. In this example, V9_1_Ref has mutiple relationships outside of V9. We can use a significance test to determine if this is a statistically significant relationship. We need to use the raw individual data to do the signifcance test.
+
+cor.test(WVS_Data_Precentages5$V9_1_Ref,WVS_Data_Precentages5$V49_1_Ref,method = "kendall")
+#this test results that indicates that the relationship is significant and should be explored further. 
+```
+
+From this plot it is still hard tell which correlations are outside the question. We will now remove all inter question correlations and test to see if the correlations that do result are statiscally significant
+```{r Kendall Rank Correlations Elimination}
+#we want to keep all variables with correlations (outside it's own question) in the PCA analysis. Correlations between varaibles of the same question are an artifact of the research design. 
+
+Eliminate_Kendall <- c("V4_","V4_","V8_","V8_","V9_","V9_","V9_",
+                       "V19_","V25_","V25_","V25_","V26_","V26_","V26_",
+                       "V27_","V27_","V27_","V28_","V28_","V29_",
+                       "V29_","V30_","V30_","V30_","V31_","V31_",
+                       "V31_","V32_","V32_","V32_","V33_","V33_",
+                       "V33_","V34_","V34_","V34_","V37_","V40_", 
+                       "V41_","V43_","V44_","V75_","V76_","V79_",
+                       "V79_","V45_","V45_","V102_","V102_","V49_",
+                       "V49_","V49_","V51_","V51_","V51_","V51_",
+                       "V52_","V53_","V53_","V53_","V53_","V67_",
+                       "V67_","V85_","V86_","V87_","V87_","V88_",
+                       "V88_","V89_","V108_","V108_","V110_","V110_",
+                       "V110_","V110_","V111_","V111_","V111_","V111_",
+                       "V115_","V115_","V115_","V116_","V116_","V116_",
+                       "V117_","V117_","V117_","V117_","V122_","V122_",
+                       "V122_","V122_","V123_","V123_","V123_","V123_",
+                       "V124_","V129_","V129_","V130_","V130_","V222_",
+                       "V222_","V222_","V222_","V223_","V223_","V223_",
+                       "V223_","V225_","V225_","V226_","V226_","V226_",
+                       "V227_","V227_","V227_","V146_","V147_","V147_",
+                       "V150_","V150_","V151_","V151_","V153_","V153_",
+                       "V211_","V211_","V211_","V106_","V106_","V106_",
+                       "V107_","V107_","V107_","V212_","V213_","V214_",
+                       "V214_","V243_","V244_","V172_","V172_","V175_",
+                       "V175_","V179_","V180_","V181_","V181_","V181_",
+                       "V182_","V182_","V183_","V183_","V183_","V183_",
+                       "V184_","V184_","V184_","V184_","V185_","V185_",
+                       "V185_","V188_","V188_","V188_","V189_","V189_",
+                       "V189_","V190_","V190_","V190_","V191_","V191_",
+                       "V191_","V98_","V98_","V99_","V100_", "V132_",
+                       "V132_","V198_","V198_","V198_","V200_","V200_",
+                       "V200_","V209_","V209_","V209_","V199_","V199_",
+                       "V199_","V201_","V201_","V202_","V203_","V203_",
+                       "V203_","V203_","V204_","V204_","V204_","V204_",
+                       "V205_","V205_","V205_","V207_","V207_","V207_",
+                       "V207_","V206_","V208_","V208_","V208_","V208_",
+                       "V163_","V163_")
+
+Keep <- c()
+i=1
+for (aRow in Correlated_Variables[c(1:220)]){
+  DF <- abs(Kendall_Correlations_0.7Corr[ , -grep(Eliminate_Kendall[i], colnames(Kendall_Correlations_0.7Corr))])
+  sum <- sum((DF[aRow,]), na.rm=T)
+  if(sum>0){Keep <- cbind(Keep, aRow)} #if sum of row is greater than 0, keep the row.
+  #if(is.na(sum==T)){next}
+  i=i+1
+}
+Keep <- c(Keep[1,])
+str(Keep)
+
+#The majority of the variables do not correlate with anything else and then we elimanted another 84 for only being correclated to other variables within the same question. They are removed from the analysis, leaving 136 variables.
+
+WVS_Data_Precentages5_0.7Corr<- WVS_Data_Precentages5[,Keep]
+Kendall_Correlations_0.7Corr_Reduced<- Kendall_Correlations[Keep, Keep]
+
+#now we need ensure that all these correlations (outside the variable questions to one another) are significant
+Result <- c()
+Sig_Correlations <- c()
+
+#while we know that there are 503 variables which have correlations greater than 0.7 with variables outside their own question, we recreate the orginal dataframes from the last loop in order to do a significance test. 
+
+for(aRow in c(1:220)){
+  DF <- Kendall_Correlations_0.7Corr[ , -grep(Eliminate_Kendall[aRow], colnames(Kendall_Correlations_0.7Corr))]
+  Cell <- ncol(DF)
+  i=1
+#change this to referring to column/row name so that I make sure it's the right one. 
+  for(i in c(1:Cell)){ #looping through each one of the columns in DF
+    if (is.na(DF[aRow,i]) == FALSE) { #if the correlation exists, or the logical arguement is false, then run a correlation test)
+      j <- colnames(DF[i])
+      k <- rownames(DF[aRow,])
+      #performing a correlation test between a row and a column - need to make sure it doesn't compare to itself
+      Correlation_Test <- cor.test(WVS_Data_Precentages5[,k], WVS_Data_Precentages5[,j], method = "kendall")
+      P_Values <- Correlation_Test$p.value
+      R_squared <- DF[k,j]
+      Result <- cbind(rownames(DF[k,]), colnames(DF[j]), R_squared, P_Values)
+      Sig_Correlations <- rbind(Sig_Correlations, Result)
+    }
+    Result<- c()
+  }
+}
+
+dim(Sig_Correlations)
+
+#now we should delete any rows which have non-significant p-values
+Sig_Correlations_Clean <- Sig_Correlations[!(as.numeric(Sig_Correlations[,4]) > 0.05),]
+dim(Sig_Correlations_Clean)
+#write.csv(Sig_Correlations_Clean, "Significant_Correlations.csv")
+```
+
+Looking at these correlations you can tell that there are variables that correlate strongly an entire questions and the correlation changes depending on the response of the variable. In order to reduce the amount of variables we could just take the postive relationships - selecting only one variable from each question that is positive and the strongest. 
+
+For example in the relationship between V8 (how important is work) and V9 (how important is religion), we kept V8_1 for V8 and V9_1 for V9 as they both are in the strongest, positive relationship between the two questions. The strongest relationship between the questions overall is between V8_1 and V9_4 (a negative relationship). 
+
+The problem is that these questions are related to other questions - we will choose the strongest postivie and negative relationships and then select the  single variable to represent the question based on the highest average correlation with the variables from the other questions. After we will ensure that we have not eliminated a variable which was uniquely correlated to one other variable.  
+```{r Kendall Rank Variables}
+#Names of columns to keep in WVS_Data_Precentages5 to keep
+VariablestoKeep <- unique(c(Sig_Correlations_Clean[,1],Sig_Correlations_Clean[,2]))
+VariablestoKeep_DF <- as.data.frame(VariablestoKeep)
+#write.csv(VariablestoKeep_DF, "Kendall_Correlation_Var.csv")
+
+str(VariablestoKeep)
+```
+
+All the 140 variables have significant (>0.05) p-values for their correlations. Now let's see how this reduced set of variables does BEFORE we further reduce the variables to only one variable per question. 
+```{r PCA6 Kendall Correlated Variabes PCA}
+WVS_Data_Precentages5_Kendall <- WVS_Data_Precentages5[,VariablestoKeep]
+ 
+Kendall_PCA <- prcomp(WVS_Data_Precentages5_Kendall, center = TRUE, scale. = TRUE)
+summary(Kendall_PCA)
+```
+```{r PCA6 Scree Plot}
+plot(Kendall_PCA, type = "l")
+```
+
+
+#Varaible Reduction: Kendall Rank Correlations - PCA Loadings
+```{r PCA6 Kendall Loadings}
+#Loadings have variables as rows
+KendallPCA_Loadings <- round(Kendall_PCA$rotation [,c(1:5)], 3)
+head(KendallPCA_Loadings)
+KendallPCA_Loadings <- as.data.frame(KendallPCA_Loadings)
+#write.csv(KendallPCA_Loadings, file= "KendallPCA_Loadings.csv")
+
+#Plots of Components
+#pdf("Loading distribution3.pdf", paper = "USr")
+par(mfrow=c(2,3))
+
+plot(KendallPCA_Loadings$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(KendallPCA_Loadings$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(KendallPCA_Loadings$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(KendallPCA_Loadings$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(KendallPCA_Loadings$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+
+```{r PCA6 Unrotated}
+plot(Kendall_PCA$rotation [,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+We can try a varimax rotations to see if that helps the loadings of the variables; however, all a roatation does is change the presepective of the data. It doesn't change how the data has been reduced. 
+
+```{r PCA6 Varimax}
+Kendall.Varimax <-varimax(Kendall_PCA$rotation)
+#try regressions with national data and then try to reduce the sample to older, educated, males - see if that helps clarify results.
+head(Kendall.Varimax$loadings[,c(1:6)])
+
+plot(Kendall.Varimax$loadings[,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+Unfortunately the loadings on these dimensions by different variables is still low, no question loads greater than .3. Hofestede's dimensions had questions loading well above that as in 0.4 to 0.6 - this is because the questions were all focused on one topic - 10 questions related to workplace goals.  From this analysis we see that many are the same as the low variance filter. One way to increase the loading and interpretation may be to choose only one variable for each question. To make this selection we would need to dig deeper into the non-parametric correlations and how the variables relate to others, as is done below.
+
+```{r Kendall Correlation Plot - Partial}
+#get rid of the correlations between variables of same questions
+for(y in c(1:220)){
+Kendall_Correlations_0.7Corr[grep(Eliminate_Kendall[y], colnames(Kendall_Correlations_0.7Corr)),
+                              grep(Eliminate_Kendall[y], colnames(Kendall_Correlations_0.7Corr))] = NA
+}
+
+library(corrplot)
+corrplot(as.matrix(Kendall_Correlations_0.7Corr[c(1:25), c(1:25) ]), 
+         na.label = "square", na.label.col = "white", tl.cex = 0.5)
+```
+```{r Kendall Correlation Plot - All}
+library(corrplot)
+corrplot(as.matrix(Kendall_Correlations_0.7Corr[c(1:100), c(1:100) ]), 
+         na.label = "square", na.label.col = "white", tl.cex = 0.5)
+```
+
+It's interesting to note that there is a clear pattern with respect to how the questions are ordered. This will become more clear when we reduce the number of variables per question to just one. 
+```{r PCA7 Kendall One Variable per Question}
+#This is just a list of the Kendall variables with the descriptions of the variables.
+Kendall.Correlation.Variable.Descriptions <- read.csv("Kendall_Correlation_Variable_Descriptions.csv")
+
+V1_Names <- merge(Sig_Correlations_Clean, Kendall.Correlation.Variable.Descriptions, by.x = "V1", by.y = "VariablestoKeep")
+
+V1_Names <- V1_Names[c("V1", "Description", "R_squared", "V2")]
+V2_Names <- merge(V1_Names, Kendall.Correlation.Variable.Descriptions, by.x = "V2", by.y = "VariablestoKeep")
+V2_Names <- V2_Names[c("V1", "Description.x", "R_squared", "V2", "Description.y")]
+#write.csv (V2_Names, "Significant_Correlations_Descriptions.csv")
+
+#This file was manually created by analyzing which correlations were the strongest between the variables within each questions and choosing one variable per questions. 
+Reduced_Variables <- read.csv("Reduced_Variables_Kendall.csv")
+Reduced_Variables <- as.matrix(Reduced_Variables)
+Reduced_Variables_List <- unique(c(Reduced_Variables[,2], Reduced_Variables[,5]))
+
+WVS_Data_Precentages5_Kendall_Clean <- WVS_Data_Precentages5[,Reduced_Variables_List]
+ 
+PCA7 <- prcomp(WVS_Data_Precentages5_Kendall_Clean, scale. = TRUE, center = TRUE)
+summary(PCA7)
+```
+
+
+
+```{r PCA7 - Kendall Single Variable per Question}
+plot(PCA7, type = "l")
+```
+
+```{r PCA7 Loadings with Descriptions}
+PCA7_Loadings <- PCA7$rotation
+PCA7_Loadings_Description <- merge(PCA7_Loadings,
+                                     Kendall.Correlation.Variable.Descriptions, by.x = 0, by.y = "VariablestoKeep" )
+
+PCA7_Loadings_Description<-PCA7_Loadings_Description[,c("Row.names", "Description", 
+                                                               "PC1", "PC2", "PC3", "PC4", "PC4")]
+```
+
+```{r PCA7 Unrotated Plot}
+plot(PCA7_Loadings[,c(1,2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated PCA7 Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+```{r PCA7 Varimax Plot}
+Kendall.Varimax <-varimax(PCA7$rotation)
+#try regressions with national data and then try to reduce the sample to older, educated, males - see if that helps clarify results.
+Kendall.Varimax.Loadings <- PCA7$loadings[,c(1:6)]
+plot(Kendall.Varimax.Loadings[,c(1,2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax PCA7 Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+```{r PCA7 Oblmin Rotation}
+Kendall.Oblimin <- oblimin(PCA7$rotation)
+Kendall.Oblimin.Loadings <- Kendall.Oblimin$loadings
+
+plot(Kendall.Oblimin.Loadings[,c(1,2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Oblimin PCA7 Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+```{r PCA7 Variable Factor Map}
+PCA(WVS_Data_Precentages5_Kendall_Clean)
+```
+
+```{r PCA7 with Country Names}
+PCA7_Scores <- PCA7$x[,c(1:5)]
+Named_PCA7_Scores <- merge(Country_Names, PCA7_Scores, by.y= 0, by.x ="Country.Code", all.y=T)
+```
+
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. Very few variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA7 Loadings and Scores}
+PCA7_Loadings[abs(PCA7_Loadings) < 0.4] = NA
+PCA_Loadings_Cleaned7<- PCA7_Loadings[rowSums(is.na(PCA7_Loadings))!= 5, ]
+head(PCA_Loadings_Cleaned7)
+```
+=======
+---
+title: "03_National_Precentage_PCA"
+author: "Leigh Allison"
+date: "August 21, 2018"
+output: html_document
+---
+#Analyzing the National Precentage Variables
+```{r}
+WVS_Data_Precentages4 <- read.csv("WVS_Data_Percentages.csv")
+```
+
+## Analyzing the Characteristics of the National Precentage Variables:Variance of Variables
+Since the WVS has a variety of different question types, we wanted to look at the variance to determine if a specific type of question would mathematically appear in the components due to the structure of the question. Primarily we were concerned about questions which asked a yes or no question and those that asked a respondant to list 5 attributes they consider important and the  variables were coded as mentioned or not mentioned. We first looked at the variance of all the variables, then the two category responses (yes or no), then the lists (mention or not mentioned).
+```{r All variables}
+Variances <- c()
+for(i in 1:829){
+  Question_Variance <- var(WVS_Data_Precentages4[,i])
+  Variances <- cbind(Variances, Question_Variance)
+}
+
+colnames(Variances)<-colnames(WVS_Data_Precentages4)
+Variance_Sorted <- t(Variances)
+
+#pdf("Variance distribution.pdf", paper = "USr")
+par(mfrow=c(2, 1))
+hist(Variances, 50)
+abline(h=20, col = "red")
+barplot(Variances)
+#dev.off()
+```
+
+```{r Y/N Questions}
+#Break into two groups - Questions with 2 answers and those with more than 2 answers. 
+#Two answer questions: 12-22, 24, 36-44, 66, 82, 83, 148, 149, 150, 151, 176, 177, 178, 179, 180, 234, 235, 236, 240, 243, 244, 245,246, 250, 252
+
+TwoCategoryQuestions<- WVS_Data_Precentages4[,c("V24_1_Ref","V24_2",
+                                                "V66_1_Ref","V66_2",
+                                                "V82_1_Ref","V82_2",
+                                                "V83_1_Ref","V83_2" ,
+                                                "V148_1_Ref","V148_2",
+                                                "V149_1_Ref","V149_2",
+                                                "V150_1_Ref","V150_2",
+                                                "V151_1_Ref","V151_2",
+                                                "V176_1_Ref","V176_5",
+                                                "V177_1_Ref","V177_5",
+                                                "V178_1_Ref","V178_5",
+                                                "V179_1_Ref","V179_5",
+                                                "V180_1_Ref","V180_5",
+                                                "V187_1_Ref", "V187_2",
+                                                "V243_1_Ref","V243_2",
+                                                "V244_1_Ref","V244_2",
+                                                "V245_1_Ref","V245_2",
+                                                "V246_1_Ref","V246_2")]
+Variances_TwoCategory<- c()
+for(i in 1:36){
+  Question_Variance_TwoCategory <- var(TwoCategoryQuestions[,i])
+  Variances_TwoCategory <- cbind(Variances_TwoCategory, Question_Variance_TwoCategory)
+}
+colnames(Variances_TwoCategory)<-colnames(TwoCategoryQuestions)
+Variance_Sorted_TwoCategory <- t(Variances_TwoCategory)
+
+#pdf("Variance_TwoCategory distribution.pdf", paper = "USr")
+par(mfrow=c(2, 1))
+hist(Variances_TwoCategory)
+barplot(Variances_TwoCategory)
+#dev.off()
+```
+
+```{r Mention-Not Mention Questions}
+MentionQuestions<- WVS_Data_Precentages4[,c("V12_1_Ref", "V12_2",
+                                                       "V13_1_Ref", "V13_2",
+                                                       "V14_1_Ref", "V14_2",
+                                                       "V15_1_Ref", "V15_2",
+                                                       "V16_1_Ref", "V16_2",
+                                                       "V17_1_Ref", "V17_2",
+                                                       "V18_1_Ref", "V18_2",
+                                                       "V19_1_Ref", "V19_2",
+                                                       "V20_1_Ref", "V20_2",
+                                                       "V21_1_Ref", "V21_2",
+                                                       "V22_1_Ref", "V22_2",
+                                                       "V36_1_Ref", "V36_2",
+                                                       "V37_1_Ref", "V37_2",
+                                                       "V38_1_Ref", "V38_2",
+                                                       "V39_1_Ref", "V39_2",
+                                                       "V40_1_Ref", "V40_2",
+                                                       "V41_1_Ref", "V41_2",
+                                                       "V42_1_Ref", "V42_2",
+                                                       "V43_1_Ref", "V43_2",
+                                                       "V44_1_Ref", "V44_2")]
+Variances_Mention<- c()
+for(i in 1:40){
+  Question_Variance_Mention <- var(MentionQuestions[,i])
+  Variances_Mention <- cbind(Variances_Mention, Question_Variance_Mention)
+}
+colnames(Variances_Mention)<-colnames(MentionQuestions)
+Variance_Sorted_Mention<- t(Variances_Mention)
+
+#pdf("Variance_Mention distribution.pdf", paper = "USr")
+par(mfrow=c(2, 1))
+hist(Variances_Mention)
+barplot(Variances_Mention)
+#dev.off()
+```
+
+```{r Questions with 3 or more response categories}
+remove <- c(colnames(TwoCategoryQuestions), colnames(MentionQuestions))
+MultipleCat_Questions<- WVS_Data_Precentages4[,!colnames(WVS_Data_Precentages4) %in% remove]
+
+Variances_MultipleCat<- c()
+for(i in 1:753){
+  Question_Variance_MultipleCat <- var(MultipleCat_Questions[,i])
+  Variances_MultipleCat <- cbind(Variances_MultipleCat, Question_Variance_MultipleCat)
+}
+colnames(Variances_MultipleCat)<-colnames(MultipleCat_Questions)
+Variance_Sorted_MultipleCat<- t(Variances_MultipleCat)
+
+#pdf("Variance_MultipleCat distribution.pdf", paper = "USr")
+par(mfrow=c(2, 1))
+hist(Variances_MultipleCat)
+barplot(Variances_MultipleCat)
+#dev.off()
+```
+
+We decided to remove the "no" and "not_mention" variables from the dataset because the variance will load in equal but opposite directions. However, since the variables are compliments, it does not matter which variables is removed.
+```{r Binary Variables to Remove}
+BinaryQuestions_RemoveVarible <- colnames(WVS_Data_Precentages4[,c("V12_2","V13_2", "V14_2", "V15_2", 
+                                                       "V16_2", "V17_2", "V18_2", 
+                                                       "V19_2",  "V20_2", "V21_2", 
+                                                       "V22_2", "V36_2", "V37_2", 
+                                                       "V38_2",  "V39_2", "V40_2", 
+                                                       "V41_2",  "V42_2", "V43_2", 
+                                                       "V44_2", "V24_2", "V66_2",
+                                                       "V82_2","V83_2","V148_2","V149_2",
+                                                       "V150_2", "V151_2","V176_5", "V177_5",
+                                                       "V178_5","V179_5","V180_5","V187_2","V243_2",
+                                                       "V244_2","V245_2", "V246_2")])
+                                         
+                                    
+WVS_Data_Precentages5 <- WVS_Data_Precentages4[,!colnames(WVS_Data_Precentages4) %in% BinaryQuestions_RemoveVarible] 
+```
+
+##Analyzing the Characteristics of the Dummy Variables: Normality Test
+Multivariate Normality - requires variables to be independent
+https://cran.r-project.org/web/packages/MVN/vignettes/MVN.pdf
+```{r Normality Test}
+#install.packages("nortest")
+library("nortest")
+
+normality_test <- apply(WVS_Data_Precentages5, 2, ad.test)
+
+#Need to determine which variables have significant p-values
+normality_p.values <- c()
+variable_names <- colnames(WVS_Data_Precentages5)
+
+for(col in c(1:791)){
+  variable_normality <- normality_test[[col]]
+  p.value <- variable_normality$p.value
+  normality_p.values <- cbind(normality_p.values, p.value)
+}
+
+colnames(normality_p.values) <-variable_names
+
+#p-values less than 0.05 mean the variables are non-normal
+nonnormal_variables <- t(normality_p.values)
+nonnormal_variables[nonnormal_variables > 0.01] = NA
+nonnormal_variables <- as.data.frame(t(na.omit(nonnormal_variables)))
+
+normal_variables <- t(normality_p.values)
+normal_variables[normal_variables < 0.01] = NA
+normal_variables <- as.data.frame(t(na.omit(normal_variables)))
+```
+315 of the 791 varaiables are not normal according to the Anderson-Darling test of normality with a p-value of 0.0, leaving 476 normal variables.
+
+##Analyzing the Characteristics of the National Precentage Variables: Intercorrelation between Variables
+Let's take a look into how the variables are related - these relationships are a combination of lantent varaiables and the fact that they are dummy variables.
+```{r Correlation Between Variables}
+library(corrplot)
+corrplot(cor(as.matrix(WVS_Data_Precentages5[,1:50])))
+corrplot(cor(as.matrix(WVS_Data_Precentages5[,51:100])))
+corrplot(cor(as.matrix(WVS_Data_Precentages5[,101:150])))
+corrplot(cor(V136_Count))
+```
+From this plot we can tell that the variables are strongly correlated with other variables from the same questions. This makes logical sense due to the way the dummy variables were created (i.e. porportion of the people from each country that answered that category). All the dummy variables for a single questions will sum to 100.
+
+#Cluster Analysis
+A simple way to see if variables are able to be dimensionally reduced is to perform a cluster analysis which analyses the points in space to determine which ones are "close" to each other.
+```{r Cluster Analysis}
+d <- dist(t(WVS_Data_Precentages5), method = "euclidean") # distance matrix
+fit <- hclust(d, method="ward.D") 
+plot(fit) # display dendogram
+# draw dendogram with red borders around the 5 clusters 
+rect.hclust(fit, k=5, border="red")
+cluster_groups <- as.data.frame(cutree(fit, k=5)) # cut tree into 5 clusters
+```
+From this cluster analysis we should expect the varaibles to group into approximately 5 dimensions. The cluster_groups dataframe shows which questions were grouped together. For example you can see that variables V4_1 and V8_1 are similar. This means that countries who consider family as "very important" also tend to consider work as "very important."
+
+#Prinicple Component Analysis
+The goal of principle component analysis is to reduce a set of correlated variables to a smaller number of uncorrelated varaibles. The goal is create a new set of varaibles that accounts for as much variability as possible. These principle components are linear combinations of the previous variables.Therefore, each component has a loading from the variables it is made up of.  
+
+When running a principle component analysis, either the correlation or covariance matrix can be used. the correlation matrix is primarily used when the data is on different scales. Since all the data is on a 0 to 100 scale, either correlation or covariance can be used. However, there must be more observations than variables to use the princomp function of R. Since our dataframe has more variables than observations, we sue the prcomp function which uses singular value decomposition to determine the components.
+
+More details: 
+http://www.sthda.com/english/wiki/principal-component-analysis-in-r-prcomp-vs-princomp-r-software-and-data-mining
+
+##Data for PCA
+In order to run a PCA we need to insure that that there is not a colinearity (i.e. variables adding to 100%). Thus we use WVS_Data_Precentages4 instead of WVS_Data_Precentages5 because we don't want to remove the binary questions completely. Therefore, we removed the 1st answer category from each variables, which means the only the negative repsonses to the two category questions are included. 
+```{r Data for PCA1 616 Variables}
+#Now that we have to remove our reference category before running the PCA. 
+WVS_Data_Precentages6<- WVS_Data_Precentages4[, -grep("Ref", colnames(WVS_Data_Precentages4))]
+```
+
+```{r PCA1 Analysis}
+PCA_Analysis_Data <- WVS_Data_Precentages6
+PCA_Analysis <-prcomp(PCA_Analysis_Data, center= TRUE, scale. = TRUE)
+summary(PCA_Analysis)
+```
+
+```{r PCA1 Scree Plot}
+plot(PCA_Analysis, main = "ScreePlot", type = "l")
+abline(h=25, col="red")
+```
+From this plot, there are 5 dimensions that can be extracted, as seen by when the line begins to level. 
+
+#PCA Result Analysis
+```{r PCA1 Scores}
+#Scores have countries as rows
+PCA_Scores <- PCA_Analysis$x[,c(1:5)]
+rownames(PCA_Scores) <- rownames(PCA_Analysis_Data)
+head(PCA_Scores)
+
+Named_PCA_Analysis_Data <- merge(Country_Names, PCA_Scores, by.y= 0, by.x ="Country.Code", all.y=T)
+#write.csv(Named_PCA_Analysis_Data, "PCA1_Scores.csv")
+```
+
+```{r PCA1 Loadings}
+#Loadings have variables as rows and factors as columns. These loadings are unrotated.
+PCA_Loadings <- round(PCA_Analysis$rotation [,c(1:5)], 3)
+PCA_Loadings <- as.data.frame(PCA_Loadings)
+
+#Plots of Components
+#pdf("Loading distribution.pdf", paper = "USr")
+par(mfrow=c(2,3))
+
+plot(PCA_Loadings$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.5, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.025, col="grey")
+abline(h=-0.025, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+
+```{r PCA1 Rotations}
+#install.packages("GPArotation")
+library(GPArotation)
+
+plot(PCA_Loadings[,c(1:2)], xlim = c(-0.2, 0.2), ylim = c(-0.2, 0.2), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(varimax(PCA_Analysis$rotation [,c(1:2)])$loadings, xlim = c(-0.2, 0.2), ylim = c(-0.2, 0.2), main = "Varimax Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(oblimin(PCA_Analysis$rotation [,c(1:2)])$loadings, xlim = c(-0.2, 0.2), ylim = c(-0.2, 0.2), main = "Oblimin Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+#the points in the graph represent how each variable weighs on the first two dimensions. The two clusters indicated that there are two groups of variables that load in similar ways on to these components.
+```
+
+```{r PCA1 Factor Map}
+#install.packages("FactoMineR")
+library(FactoMineR)
+PCA(WVS_Data_Precentages6)
+```
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Furthermore, each variable much be interpreted with respect to the reference variable that was removed (as in done in tradition regression literature when a variable has to be removed to avoid collinearity.) Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r Cleaned PCA1 Loadings}
+PCA_Loadings[abs(PCA_Loadings) < 0.4] = NA
+PCA_Loadings_Cleaned1 <- PCA_Loadings[rowSums(is.na(PCA_Loadings))!= 5, ]
+head(PCA_Loadings_Cleaned1)
+```
+
+
+#Varaible Reduction 
+
+## Varaible Reduction: Chi-Square Test
+To reduce the amount of noise in the PCA analysis, we can remove questions that do not significantly vary with country. We use a chi-square significance test on the contingency tables that we created when counting the number of responses for each dummy variable by country. A chi-square significance test determines if two categorical variables have a significant association with one another. For p-values less than 0.05, we fail to reject the null hypothesis, implying that the variables are significantly  related to each other. In this project, we are comparing the questions variables (separately) to the country variable. 
+
+(More Information on Chi-sure:http://sites.stat.psu.edu/~ajw13/stat200_notes/12_assoc/10_assoc_print.htm)
+```{r Chi Square Test, warning=FALSE}
+#Create a list of the dataframes that must run chi-square test on. 
+#NOTE: Chi-square will not work on variables which contain zeros so those must be removed before running test.
+
+Cat_Questions_CountDF<- list(V4_Count=V4_Count,V5_Count=V5_Count,V6_Count=V6_Count,V7_Count=V7_Count,
+                             V8_Count=V8_Count,V9_Count=V9_Count,V10_Count=V10_Count,V11_Count=V11_Count,
+                             V12_Count=V12_Count,V13_Count=V13_Count,V14_Count=V14_Count,V15_Count=V15_Count,
+                             V16_Count=V16_Count,V17_Count=V17_Count,V18_Count=V18_Count,V19_Count=V19_Count,
+                             V20_Count=V20_Count,V21_Count=V21_Count,V22_Count=V22_Count,V25_Count=V25_Count,
+                             V26_Count=V26_Count,V27_Count=V27_Count,V28_Count=V28_Count,V29_Count=V29_Count,
+                             V30_Count=V30_Count,V31_Count=V31_Count,V32_Count=V32_Count,V33_Count=V33_Count,
+                             V34_Count=V34_Count,V35_Count=V35_Count,V37_Count=V37_Count,V42_Count=V42_Count,
+                             V39_Count=V39_Count,V38_Count=V38_Count,V36_Count=V36_Count,V40_Count=V40_Count,
+                             V41_Count=V41_Count,V43_Count=V43_Count,V44_Count=V44_Count,V24_Count=V24_Count,
+                             V70_Count=V70_Count,V71_Count=V71_Count,V72_Count=V72_Count,V73_Count=V73_Count,
+                             V75_Count=V75_Count,V76_Count=V76_Count,V77_Count=V77_Count,V78_Count=V78_Count,
+                             V79_Count=V79_Count,V74_Count=V74_Count,V165_Count=V165_Count,V166_Count=V166_Count,
+                             V167_Count=V167_Count,V168_Count=V168_Count,V169_Count=V169_Count,
+                             V81_Count=V81_Count,V82_Count=V82_Count,V83_Count=V83_Count,V45_Count=V45_Count,
+                             V46_Count=V46_Count,V102_Count=V102_Count,V49_Count=V49_Count,V54_Count=V54_Count,
+                             V51_Count=V51_Count,V52_Count=V52_Count,V50_Count=V50_Count,V48_Count=V48_Count,
+                             V47_Count=V47_Count,V53_Count=V53_Count,V60_Count=V60_Count,V61_Count=V61_Count,
+                             V62_Count=V62_Count,V63_Count=V63_Count,V64_Count=V64_Count,V65_Count=V65_Count,
+                             V66_Count=V66_Count,V67_Count=V67_Count,V68_Count=V68_Count,V69_Count=V69_Count,
+                             V80_Count=V80_Count,V84_Count=V84_Count,V85_Count=V85_Count,V86_Count=V86_Count,
+                             V87_Count=V87_Count,V88_Count=V88_Count,V89_Count=V89_Count,V108_Count=V108_Count,
+                             V109_Count=V109_Count,V110_Count=V110_Count,V111_Count=V111_Count,V112_Count=V112_Count,
+                             V113_Count=V113_Count,V114_Count=V114_Count,V115_Count=V115_Count,V116_Count=V116_Count,
+                             V117_Count=V117_Count,V118_Count=V118_Count,V119_Count=V119_Count,V120_Count=V120_Count,
+                             V121_Count=V121_Count,V122_Count=V122_Count,V123_Count=V123_Count,V124_Count=V124_Count,
+                             V126_Count=V126_Count,V127_Count=V127_Count,V128_Count=V128_Count,V129_Count=V129_Count,
+                             V130_Count=V130_Count,V142_Count=V142_Count,V217_Count=V217_Count,V218_Count=V218_Count,
+                             V219_Count=V219_Count,V220_Count=V220_Count,V221_Count=V221_Count,V222_Count=V222_Count,
+                             V223_Count=V223_Count,V224_Count=V224_Count,V225_Count=V225_Count,V226_Count=V226_Count,
+                             V227_Count=V227_Count,V143_Count=V143_Count,V145_Count=V145_Count,V146_Count=V146_Count,
+                             V147_Count=V147_Count,V148_Count=V148_Count,V149_Count=V149_Count,V150_Count=V150_Count,
+                             V151_Count=V151_Count,V153_Count=V153_Count,V154_Count=V154_Count,V155_Count=V155_Count,
+                             V156_Count=V156_Count,V211_Count=V211_Count,V103_Count=V103_Count,V104_Count=V104_Count,
+                             V105_Count=V105_Count,
+                             V106_Count=V106_Count,V107_Count=V107_Count,V212_Count=V212_Count,V213_Count=V213_Count,
+                             V214_Count=V214_Count,V216_Count=V216_Count,V243_Count=V243_Count,V244_Count=V244_Count,
+                             V245_Count=V245_Count,V246_Count=V246_Count,V170_Count=V170_Count,V171_Count=V171_Count,
+                             V172_Count=V172_Count,V173_Count=V173_Count,V174_Count=V174_Count,V175_Count=V175_Count,
+                             V176_Count=V176_Count,V177_Count=V177_Count,V178_Count=V178_Count,V179_Count=V179_Count,
+                             V180_Count=V180_Count,V181_Count=V181_Count,V182_Count=V182_Count,V183_Count=V183_Count,
+                             V184_Count=V184_Count,V185_Count=V185_Count,V186_Count=V186_Count,V187_Count=V187_Count,
+                             V188_Count=V188_Count,V189_Count=V189_Count,V190_Count=V190_Count,V191_Count=V191_Count)
+
+Chisq_Signifance_Categorical <- c()
+for (DF in Cat_Questions_CountDF){
+  DF <- na.omit(DF)
+  DF <- DF[,-(which(colSums(DF) == 0))] 
+  Chisq_Signifance_Test <- chisq.test(DF, simulate.p.value = TRUE, B = 10000)
+  Chisq_Signifance_Categorical <- rbind(Chisq_Signifance_Categorical, Chisq_Signifance_Test$p.value)
+  }
+
+#For the ordinal questions used the grouped varaibles, which are precentages - need to create new count tables that are grouped together by the categories - very low, low, medium, high, and very high
+
+Ordinal_df_Count<- list(V23_Count,V56_Count,V55_Count,V157_Count,V158_Count,
+                        V159_Count,V160_Count,V164_Count,V59_Count,V95_Count,
+                        V96_Count,V97_Count,V98_Count,V99_Count,V100_Count,
+                        V101_Count,V131_Count,V132_Count,V134_Count,V135_Count,
+                        V136_Count,V137_Count,V138_Count,V141_Count,V192_Count,
+                        V194_Count,V197_Count,V198_Count,V200_Count,V209_Count,
+                        V210_Count,V199_Count,V201_Count,V202_Count,V203_Count,
+                        V204_Count,V205_Count,V207_Count,V206_Count,V208_Count,
+                        V195_Count, V196_Count)
+
+Ordinal_Question_Column_Names<- c("V23","V56",'V55', 'V157',
+                                'V158','V159','V159','V164',
+                                'V59','V95','V96','V97',
+                                'V98','V99','V100','V101',
+                                'V131','V132','V134','V135',
+                                'V136',"V137","V138", "V141",
+                                'V192','V194','V197','V198','V200','V209',
+                                'V210','V199','V201','V202','V203',
+                                'V204','V205','V207', 'V206','V208',
+                                "V195", "V196")
+count = 1
+Ordinal_Question_Category_Count =c() #List to name the category dataframes
+
+for(i in 1:42){ 
+  Question_Name <- paste(Ordinal_Question_Column_Names[i], "Category_Count", sep = "_")
+  Ordinal_Question_Category_Count <- c(Ordinal_Question_Category_Count, Question_Name)
+}
+
+for(df in Ordinal_df_Count){
+  VLow<-as.data.frame(apply(df[,c(1:2)],1,sumNA))
+  Low<-as.data.frame(apply(df[,c(3:4)],1,sumNA))
+  Med<-as.data.frame(apply(df[,c(5:6)],1,sumNA))
+  High<-as.data.frame(apply(df[,c(7:8)],1,sumNA))
+  VHigh<-as.data.frame(apply(df[,c(9:10)],1,sumNA))
+
+Categorized <-cbind(VLow, Low, Med, High, VHigh)
+colnames(Categorized) <- c("Very Low_Ref", "Low", "Med", "High", " Very High")
+colnames(Categorized) <- paste(Ordinal_Question_Column_Names[count], colnames(Categorized), sep = "_")
+assign(Ordinal_Question_Category_Count[count], Categorized)
+count=count+1
+}
+
+#VLow_V161 <-V161_Counts[,1]
+Low_V161 <- as.data.frame(apply(V161_Counts[,c(1:2)],1,sumNA))
+Med_V161 <-V161_Counts[,3]
+High_V161 <-as.data.frame(apply(V161_Counts[,c(4:5)],1,sumNA))
+#VHigh_V161 <-V161_Counts[,5]
+
+
+V161_Categorized_Count <-cbind(Low_V161, Med_V161, High_V161)
+colnames(V161_Categorized) <- c("V161_Low_Ref", "V161_Med", "V161_High")
+
+#VLow_V162 <-V162_Counts[,1]
+Low_V162 <- as.data.frame(apply(V162_Counts[,c(1:2)],1,sumNA))
+Med_V162 <-V162_Counts[,3]
+High_V162 <-as.data.frame(apply(V162_Counts[,c(4:5)],1,sumNA))
+#VHigh_V162 <-V162_Counts[,5]
+
+
+V162_Categorized_Count <-cbind(Low_V162, Med_V162, High_V162)
+colnames(V161_Categorized) <- c("V162_Low_Ref", "V162_Med", "V162_High")
+
+#VLow_V163 <-V163_Counts[,1]
+Low_V163 <- as.data.frame(apply(V163_Counts[,c(1:2)],1,sumNA))
+Med_V163 <-V163_Counts[,3]
+High_V163 <-as.data.frame(apply(V163_Counts[,c(4:5)],1,sumNA))
+#VHigh_V163 <-V163_Counts[,5]
+
+
+V163_Categorized_Count <-cbind(Low_V163, Med_V163, High_V163)
+colnames(V163_Categorized) <- c("V163_Low_Ref", "V163_Med", "V163_High")
+
+Ordinal_Question_CountDF<- list(V23_Category_Count=V23_Category_Count,V56_Category_Count=V56_Category_Count,
+                                V55_Category_Count=V55_Category_Count, V157_Category_Count=V157_Category_Count,
+                                V158_Category_Count=V158_Category_Count,V159_Category_Count=V159_Category_Count,
+                                V159_Category_Count=V159_Category_Count,V164_Category_Count=V164_Category_Count,
+                                V59_Category_Count=V59_Category_Count,V95_Category_Count=V95_Category_Count,
+                                V96_Category_Count=V96_Category_Count,V97_Category_Count=V97_Category_Count,
+                                V98_Category_Count=V98_Category_Count,V99_Category_Count=V99_Category_Count,
+                                V100_Category_Count=V100_Category_Count,V101_Category_Count=V101_Category_Count,
+                                V131_Category_Count=V131_Category_Count,V132_Category_Count=V132_Category_Count,
+                                V134_Category_Count=V134_Category_Count,V135_Category_Count=V135_Category_Count,
+                                V136_Category_Count=V136_Category_Count,V137_Category_Count=V137_Category_Count,
+                                V138_Category_Count=V138_Category_Count,V141_Category_Count=V141_Category_Count,
+                                V192_Category_Count=V192_Category_Count,V194_Category_Count=V194_Category_Count,
+                                V197_Category_Count=V197_Category_Count,V198_Category_Count=V198_Category_Count,
+                                V200_Category_Count=V200_Category_Count,V209_Category_Count=V209_Category_Count,
+                                V210_Category_Count=V210_Category_Count,V199_Category_Count=V199_Category_Count,
+                                V201_Category_Count=V201_Category_Count,V202_Category_Count=V202_Category_Count,
+                                V203_Category_Count=V203_Category_Count,V204_Category_Count=V204_Category_Count,
+                                V205_Category_Count=V205_Category_Count,V207_Category_Count=V207_Category_Count, 
+                                V206_Category_Count=V206_Category_Count,V208_Category_Count=V208_Category_Count,
+                                V195_Category_Count=V195_Category_Count, V196_Category_Count=V196_Category_Count,
+                                V161_Categorized_Count=V161_Categorized_Count[,c(1:3)],
+                                V162_Categorized_Count=V162_Categorized_Count[,c(1:3)],
+                                V163_Categorized_Count=V163_Categorized_Count[,c(1:3)])
+
+Chisq_Signifance_Ordinal <- c()
+for (DF in Ordinal_Question_CountDF){
+  Chisq_Signifance_Test <- chisq.test(DF, simulate.p.value = TRUE, B = 10000)
+  Chisq_Signifance_Ordinal <- rbind(Chisq_Signifance_Ordinal, Chisq_Signifance_Test$p.value)
+}
+
+dim(Chisq_Signifance_Categorical)
+dim(Chisq_Signifance_Ordinal)
+#All the questions are signifinicantly impacted by the country according to the chi-sqare test of significance.
+```
+
+##Varaible Reduction: PCA on Question's Precentage Dataframe
+In order to reduce the number of variables going to into the PCA, we could reduce the dummy variables into dummy dimensions by conducting a PCA on the percentage data frames. This will create one dimension for each questions representing all the dummy variables.
+```{r PCA2 Variable Reduction with Question Dimensions}
+PCA2a_Scores <- c()
+
+for (DF in Cat_Questions_CountDF){
+  PCA_DF <- prcomp(DF)
+  PCA2a_Scores_DF <- PCA_DF$x[,1]
+  PCA2a_Scores <- cbind(PCA2a_Scores, PCA2a_Scores_DF)
+}
+
+for (DF in Ordinal_Question_CountDF){
+  PCA_DF <- prcomp(DF)
+  PCA2a_Scores_DF <- PCA_DF$x[,1]
+  PCA2a_Scores <- cbind(PCA2a_Scores, PCA2a_Scores_DF)
+}
+
+PCA2a_colnames <- c('V4','V5','V6','V7','V8','V9','V10','V11','V12','V13','V14','V15','V16',
+                   'V17','V18','V19','V20','V21',
+                   'V22','V25','V26','V27','V28','V29','V30','V31','V32','V33','V34','V35',
+                   'V37','V42','V39','V38','V36',
+                   'V40','V41','V43','V44','V24','V70','V71','V72','V73','V75','V76','V77',
+                   'V78','V79','V74','V165',
+                   'V166','V167','V168','V169','V81','V82','V83','V45','V46',
+                   'V102','V49','V54','V51','V52','V50',
+                   'V48','V47','V53','V60','V61','V62','V63','V64','V65','V66','V67','V68',
+                   'V69','V80','V84','V85',
+                   'V86','V87','V88','V89','V108','V109','V110','V111','V112','V113','V114',
+                   'V115','V116','V117',
+                   'V118','V119','V120','V121','V122','V123','V124','V126','V127','V128','V129','V130','V142','V217',
+                   'V218','V219','V220','V221','V222','V223','V224','V225','V226','V227','V143','V145','V146','V147',
+                   'V148','V149','V150','V151','V153','V154','V155','V156','V211','V103','V104',"V105",'V106','V107','V212',
+                   'V213','V214','V216','V243','V244','V245','V246','V170','V171','V172','V173','V174','V175','V176',
+                   'V177','V178','V179','V180','V181','V182','V183','V184','V185','V186','V187','V188','V189','V190',
+                   'V191',
+                   'V23_Category','V56_Category','V55_Category','V157_Category','V158_Category','V159_Category',
+                   'V160_Category','V164_Category','V59_Category','V95_Category','V96_Category','V97_Category',
+                   'V98_Category','V99_Category','V100_Category','V101_Category','V131_Category','V132_Category',
+                   'V134_Category','V135_Category','V136_Category','V137_Category','V138_Category',
+                   'V141_Category','V192_Category','V194_Category',
+                   'V197_Category','V198_Category','V200_Category','V209_Category',
+                   'V210_Category','V199_Category','V201_Category','V202_Category','V203_Category',
+                   'V204_Category','V205_Category','V207_Category', 'V206_Category','V208_Category',
+                   'V195_Category',"V196_Cateogry",
+                   'V161_Categorized', 'V162_Categorized', 'V163_Categorized')
+
+colnames(PCA2a_Scores) <- PCA2a_colnames
+
+PCA_2b <- prcomp(PCA2a_Scores, center= TRUE, scale. = TRUE)
+summary(PCA_2b)
+```
+
+```{r PCA2 Scree Plot}
+plot(PCA_2b, type = "l")
+```
+
+```{r PCA2 Loadings}
+#Loadings have variables as rows
+PCA_Loadings2 <- round(PCA_2b$rotation [,c(1:5)], 3)
+head(PCA_Loadings2)
+PCA_Loadings2 <- as.data.frame(PCA_Loadings2)
+
+
+#Plots of Components
+#pdf("Loading distribution2.pdf", paper = "USr")
+par(mfrow=c(2,3))
+
+plot(PCA_Loadings2$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings2$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings2$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings2$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings2$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+
+```{r PCA2 Rotations}
+PCA_2.Varimax <-varimax(PCA_2b$rotation)
+
+plot(PCA_2b$rotation [,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(varimax(PCA_2b$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(oblimin(PCA_2b$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Oblimin Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+```{r PCA2 Variable Factor Map}
+PCA(PCA2a_Scores)
+```
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Furthermore, each variable much be interpreted with respect to the fact that it is a dimension itself based on the orginal variables and representing some proportion of the original data. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA2 Cleaning out values smaller than 0.1}
+PCA_Loadings2[abs(PCA_Loadings2) < 0.1] = NA
+PCA_Loadings_Cleaned2 <- PCA_Loadings2[rowSums(is.na(PCA_Loadings2))!= 5, ]
+head(PCA_Loadings_Cleaned2)
+
+PCA_Scores2 <- PCA_2b$x[,c(1:5)]
+Named_PCA_Analysis_Data2 <- merge(Country_Names, PCA_Scores2, by.y= 0, by.x ="Country.Code", all.y=T)
+```
+
+##Varaible Reduction:Low Variance Filter
+Sometimes variables are removed because they have low variance. Removing these variables will help to reduce the noise in the results of the PCA analysis. 
+```{r PCA3 Low Variance Filter}
+#Removing variables with less than 20% of maximum varaince.
+High_Variance_Variables <- subset(Variance_Sorted, Variance_Sorted[,1] >= ((0.2)*max(Variance_Sorted[,1])))
+
+WVS_Data_Precentages5_Inverse <- t(WVS_Data_Precentages5)
+High_Variance_Variables_Responses <- merge(High_Variance_Variables, WVS_Data_Precentages5_Inverse, by.x=0, by.y=0)
+rownames(High_Variance_Variables_Responses) <- High_Variance_Variables_Responses$Row.names
+High_Variance_Variables_Responses <- High_Variance_Variables_Responses[ ,c(3:58)]
+High_Variance_Variables_Responses <- t(High_Variance_Variables_Responses)
+
+#Now that we could to remove our reference category before running the PCA - however no questions retained all dummy variables after low variability dummy variables were removed therefore we did not remove the dummy variables.
+WVS_Data_Precentages7<- High_Variance_Variables_Responses[, -grep("Ref", colnames(High_Variance_Variables_Responses))]
+
+#This reduces are variables to 131 from the 617 that we started with 
+High_Variance_Variables_Responses_Names <- as.data.frame(colnames(High_Variance_Variables_Responses))
+
+PCA_3 <- prcomp(High_Variance_Variables_Responses, center= TRUE, scale. = TRUE)
+summary(PCA_3)
+```
+
+
+```{r pCA3 Scree Plot}
+plot(PCA_3, type = "l")
+abline(h=5, col="red")
+```
+
+
+```{r PCA3 Variables Factor Map}
+PCA(High_Variance_Variables_Responses)
+```
+
+```{r PCA3 Loadings}
+#Loadings have variables as rows
+PCA_Loadings3 <- round(PCA_3$rotation [,c(1:5)], 3)
+head(PCA_Loadings3)
+PCA_Loadings3 <- as.data.frame(PCA_Loadings3)
+
+#Plots of Components
+#pdf("Loading distribution3.pdf", paper = "USr")
+par(mfrow=c(2,3))
+
+plot(PCA_Loadings3$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings3$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings3$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings3$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings3$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+```{r PCA3 Rotations}
+plot(PCA_3$rotation [,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(varimax(PCA_3$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(oblimin(PCA_3$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Oblimin Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA3 Loadings and Scores}
+PCA_Loadings3[abs(PCA_Loadings3) < 0.4] = NA
+PCA_Loadings_Cleaned3 <- PCA_Loadings3[rowSums(is.na(PCA_Loadings3))!= 5, ]
+head(PCA_Loadings3)
+
+PCA_Scores3 <- PCA_3$x[,c(1:5)]
+```
+
+##Varaible Reduction:Low Variance Filter - 1 Variable Per Questions with Highest Variance
+We also tried selecting only one variable per question. We did this by selecting the variable with the highest variance within the question. The PCA results are not clear so we don't continue with a regression analysis.
+```{r 1 Variable Per Questions with Highest Variance}
+High_Variance_Question <- c()
+for (DF in Cat_Question_Count){
+  #DF <- na.omit(DF)
+  DF <- DF[,c(1:9)]
+  DF <- DF[,-(which(colSums(DF) == 0))] 
+  Question_Variance <- apply(DF, 2, var)
+  High_Variance_Variable <-names(which.max(Question_Variance))
+  High_Variance_Question <- rbind(High_Variance_Question, High_Variance_Variable)
+  }
+
+#Take out the 5 Point Categories beause they are a different size
+Ordinal_Question_DF <- list(V23_Category,
+                                   V56_Category,V55_Category,V157_Category,V158_Category,V159_Category,
+                                   V160_Category,V164_Category,V59_Category,V95_Category,V96_Category,V97_Category,
+                                   V98_Category,V99_Category,V100_Category,V101_Category,V131_Category,V132_Category,
+                                   V134_Category,V135_Category,V136_Category,V137_Category,V138_Category,
+                                   V141_Category,V192_Category,V194_Category,
+                                   V197_Category,V198_Category,V200_Category,V209_Category,
+                                   V210_Category,V199_Category,V201_Category,V202_Category,V203_Category,
+                                   V204_Category,V205_Category,V207_Category, V206_Category,V208_Category,
+                                   V195_Category,V196_Category)
+
+for (DF in Ordinal_Question_DF){
+  #DF <- na.omit(DF)
+  DF <- DF[,c(1:5)]
+  #DF <- DF[,-(which(colSums(DF) == 0))] 
+  Question_Variance <- apply(DF, 2, var)
+  High_Variance_Variable <-names(which.max(Question_Variance))
+  High_Variance_Question <- rbind(High_Variance_Question, High_Variance_Variable)
+  }
+
+FivePt_Likert <- apply(PFL_5Scale_Cat[c(1:3,7:9,13:15)],2,var)
+
+High_Variance_Question <- rbind(High_Variance_Question, "V161_Med", "V162_High", "V163_High")
+
+#these are the variables to analyze. USE WVS4 - because either the yes or the no variable could have been chosen
+
+PCA4_Data <- WVS_Data_Precentages4[,High_Variance_Question]
+
+PCA4 <- prcomp(PCA4_Data, center = TRUE, scale. = TRUE)
+summary(PCA4)
+```
+
+```{r PCA4 Variable Factor Plot}
+PCA(PCA4_Data)
+```
+
+```{r PCA4 Scree Plot}
+plot(PCA7, type = "l")
+abline(h=3000, col="red")
+```
+
+```{r PCA4 Loadings}
+#Loadings have variables as rows
+PCA_Loadings4 <- round(PCA4$rotation [,c(1:5)], 3)
+head(PCA_Loadings7)
+PCA_Loadings4 <- as.data.frame(PCA_Loadings4)
+
+par(mfrow=c(2,3))
+
+plot(PCA_Loadings4$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings4$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings4$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings4$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(PCA_Loadings4$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+
+```{r PCA4 Rotations}
+plot(PCA4$rotation [,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(varimax(PCA4$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+
+plot(oblimin(PCA4$rotation [,c(1:2)])$loadings, xlim = c(-1, 1), ylim = c(-1, 1), main = "Oblimin Rotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA4 Loadings and Scores}
+PCA_Loadings4[abs(PCA_Loadings4) < 0.4] = NA
+PCA_Loadings_Cleaned4 <- PCA_Loadings4[rowSums(is.na(PCA_Loadings4))!= 5, ]
+head(PCA_Loadings4)
+
+PCA_Scores4 <- PCA4$x[,c(1:5)]
+head(PCA_Scores4)
+```
+
+#Varaible Reduction: Non-Parametric Rank Correlations
+When Hofstede developed his cultural model and dimesnsions he used the Spearman rank correlations to determine which variables to analyze further. For example for the construction of the power distance index, Hofstede choose one question (measured on a likert scale), theorhetically and then looked for other varaibles (likert or porportions) which had strong (over 0.5), signifiant relationships with the orginal questions. He then retained the conceptually related varaibles which had the strongest most signifcant relationship to that orginial question. The final PDI index is based on three vairables.
+
+In this study, we are aiming to avoid using theorhetical elimination of questions; therefore we looked at the Spearman and Kendall correlations between the variables. We are specifically interested in if the variables have a significant relationship with variables outside it's own question. In the code we calculated the Spearman coefficients. We did not use the pearson correlation corefficients because the variables are not normally distributted. 
+
+##Varaible Reduction: Spearman Rank Correlations
+```{r Spearman Rank Correlations, warning=FALSE}
+Spearman_Correlations <- cor(WVS_Data_Precentages5, method = "spearman")
+Spearman_Correlations <- as.data.frame(Spearman_Correlations)
+Spearman_Correlations[abs(Spearman_Correlations) < 0.7] = NA
+
+#remove columns/rows which sum to 1 - because that implies that only correlate with themselves at 0.7 or higher
+Spearman_Correlations_NoCorr<- Spearman_Correlations[,-(which(colSums(Spearman_Correlations, na.rm=TRUE) == 1.00))] 
+
+#the list below is the variables to keep
+Correlated_Variables <- names(Spearman_Correlations_NoCorr)
+
+#There are 180 varaibles that do not correlate with anything else. They should be removed from the analysis. 
+ Spearman_Correlations_0.7Corr<- Spearman_Correlations[Correlated_Variables, Correlated_Variables]
+
+ #However, this still leaves 617 variables - which when looking at some of the correlations, not all of them make sense. This can be attributed to how the Spearman test manages ties in the data. When there is a tie the assigned rank is the average of their values in the separate lists.
+ str(Correlated_Variables)
+ 
+ Eliminate_Spearman <- c("V4_", "V4_","V5_","V5_","V5_","V6_","V6_",
+                        "V6_","V7_","V7_","V7_","V7_","V8_","V8_","V8_",
+                        "V9_","V9_","V9_","V10_","V10_","V10_","V10_",
+                        "V11_","V11_","V19_","V25_","V25_","V25_",
+                        "V26_","V26_","V26_","V27_","V27_","V27_",
+                        "V28_","V28_","V28_","V29_","V29_","V29_",
+                        "V30_","V30_","V30_","V31_","V31_","V31_",
+                        "V32_","V32_","V32_2","V33_","V33_","V33_","V34_",
+                        "V34_","V34_","V35_","V35_","V35_","V37_","V42_",
+                        "V39_","V38_", "V36_","V40_","V41_","V43_","V44_",
+                        "V24_","V70_","V70_","V70_","V71_","V71_","V71_",
+                        "V71_","V71_","V71_","V72_","V72_","V72_","V72_",
+                        "V72_","V73_","V73_","V73_","V73_","V73_",
+                        "V75_","V75_","V75_","V75_","V75_","V76_",
+                        "V76_","V76_","V76_","V76_","V76_","V77_","V77_",
+                        "V77_","V77_","V77_","V78_","V78_","V78_",
+                        "V78_","V78_","V78_","V79_","V79_","V79_","V79_",
+                        "V79_","V79_","V74_","V74_","V74_","V74_","V74_",
+              "V165_","V165_","V166_","V166_","V166_","V167_","V168_","V168_","V168_","V168_",
+              "V169_","V169_","V169_","V82_","V45_","V45_","V45_","V46_","V102_","V102_",
+              "V102_","V102_","V49_","V49_","V49_","V49_4","V54_","V54_2","V54_3","V54_4",
+              "V51_","V51_","V51_","V51_","V52_","V52_2","V52_3","V52_4","V50_1","V50_3",
+              "V48_","V47_","V47_","V47_","V53_","V53_","V53_","V53_","V60_","V60_",
+              "V61_","V62_","V63_","V64_","V67_","V67_","V67_" ,"V68_","V68_","V69_","V69_","V69_",
+              "V84_","V84_","V85_","V85_" ,"V85_","V86_","V86_","V86_","V87_","V87_","V87_","V88_",
+              "V88_","V88_","V89_","V89_","V89_","V108_","V108_","V108_","V109_","V109_","V109_",
+              "V109_","V110_","V110_","V110_","V110_","V111_","V111_","V111_","V111_","V112_",
+              "V112_","V112_","V112_","V113_","V113_","V113_","V113_","V114_","V114_","V114_",
+              "V114_","V115_","V115_","V115_","V115_","V116_","V116_","V116_","V116_","V117_",
+              "V117_","V117_","V117_","V118_","V118_","V118_","V118_","V119_","V119_","V119_",
+              "V120_","V120_","V120_","V120_","V121_","V121_","V121_","V121_","V122_","V122_",
+              "V122_","V122_","V123_","V123_","V123_","V123_","V124_","V124_","V124_","V124_",
+              "V126_","V126_","V126_","V127_","V127_","V128_","V129_","V129_","V129_","V130_",
+              "V130_","V142_","V142_","V142_","V217_","V217_","V217_","V218_","V218_","V219_", 
+              "V219_","V219_","V220_","V220_","V221_","V221_","V221_","V222_","V222_","V222_",           
+              "V222_","V222_","V223_","V223_","V223_","V223_","V223_","V225_","V225_","V226_",
+              "V226_","V226_","V227_","V227_","V227_","V143_","V143_","V143_","V145_","V145_",
+              "V145_","V145_","V146_","V146_","V146_","V147_","V147_","V147_","V148_","V149_",
+              "V150_","V150_","V150_","V151_","V151_","V151_","V153_","V153_","V153_","V153_",
+              "V154_","V154_","V154_","V155_","V155_","V156_","V156_","V156_","V211_","V211_",
+              "V211_","V211_","V103_","V103_","V103_","V104_","V104_","V104_","V106_","V106_",
+              "V106_","V106_","V107_","V107_","V107_","V107_","V212_","V212_","V212_","V212_",
+              "V213_","V213_","V213_","V213_","V214_","V214_","V214_","V214_","V216_","V216_",
+              "V216_","V243_","V244_","V170_","V170_","V171_","V171_","V171_","V171_","V172_",
+              "V172_","V172_","V173_","V173_","V173_","V173_","V174_","V174_","V174_","V174_", 
+              "V175_","V175_","V175_","V175_","V176_","V177_","V179_","V180_","V181_","V181_",
+              "V181_","V181_","V182_","V182_","V182_","V182_","V183_","V183_","V183_","V183_",
+              "V184_","V184_","V184_","V184_","V185_","V185_","V185_","V185_","V186_","V186_",
+              "V188_","V188_","V188_","V188_","V189_","V189_","V189_","V189_","V190_","V190_",
+              "V190_","V190_","V191_","V191_","V191_","V191_","V23_","V23_","V23_","V23_",
+              "V23_","V56_","V56_","V55_","V55_","V55_","V55_","V55_","V157_","V157_",
+              "V158_","V158_","V158","V159_","V159_","V159_","V159_","V160_","V164_",
+              "V164_","V59_","V59_","V59_","V59_ ","V96_","V96_","V96_","V96_","V97_",
+              "V97_","V97_","V98_","V98_","V98_","V98_","V99_","V99_","V99_","V100_",
+              "V100_","V100_","V100_","V101_","V101_","V101_","V101_","V131_","V131_","V131_",
+              "V131_","V132_","V132_","V132_","V132_","V132_","V134_","V134_","V134_","V134_",
+              "V134_","V135_","V135_","V135_","V135_","V135_","V136_","V136_","V136_","V136_",
+              "V136_","V137_","V137_","V137_","V137_","V138_","V138_","V138_","V141_","V141_",         
+              "V141_","V141_","V192_","V192_","V192_","V194_","V194_","V194_","V194_","V194_",
+              "V197_","V197_","V197_",         
+              "V197_","V197_","V198_","V198_","V198_","V198_","V198_","V200_","V200_","V200_",         
+              "V200_","V200_","V209_","V209_","V209_","V209_","V209_","V210_","V210_","V210_",
+              "V210_","V210_","V199_","V199_","V199_","V199_","V199_","V201_","V201_","V201_",
+              "V201_","V201_","V202_","V202_","V202_","V202_","V202_","V203_","V203_","V203_",
+              "V203_","V203_","V204_","V204_","V204_","V204_","V205_","V205_","V205_","V205_",
+              "V207_","V207_","V207_","V207_","V207_","V206_","V206_","V206_","V208_","V208_",
+              "V208_","V208_","V208_",
+              "V195_","V195_","V195_","V195_","V196_","V196_","V196_","V196_", 
+              "V161_","V161_","V161_","V162_","V162_","V162_","V163_",
+              "V163_","V163_")
+Keep <- c()
+i=1
+for (aRow in Correlated_Variables[c(1:617)]){
+  DF <- abs(Spearman_Correlations_0.7Corr[ , -grep(Eliminate_Spearman[i], colnames(Spearman_Correlations_0.7Corr))])
+  sum <- sum((DF[aRow,]), na.rm=T)
+  if(sum>0){Keep <- cbind(Keep, aRow)} #if sum of row is greater than 0, keep the row.
+  #if(is.na(sum==T)){next}
+  i=i+1
+}
+Keep <- c(Keep[1,])
+str(Keep)
+
+#There are 180 varaibles that do not correlate with anything else and then we elimanted another 113 for only being correclated to other variables within the same question. They are removed from the analysis, leaving 504 variables. 
+WVS_Data_Precentages5_0.7Corr<- WVS_Data_Precentages5[,Keep]
+Spearman_Correlations_0.7Corr_Reduced<- Spearman_Correlations[Keep, Keep]
+
+#now we need ensure that all these correlations (outside the variable questions to one another) are significant
+Result <- c()
+Sig_Correlations <- c()
+
+#while we know that there are 503 variables which have correlations greater than 0.7 with variables outside their own question, we recreate the orginal dataframes from the last loop in order to do a significance test. 
+
+for(aRow in c(1:220)){
+  DF <- Spearman_Correlations_0.7Corr[ , -grep(Eliminate_Spearman[aRow], colnames(Spearman_Correlations_0.7Corr))]
+  Cell <- ncol(DF)
+  i=1
+#change this to referring to column/row name so that I make sure it's the right one. 
+  for(i in c(1:Cell)){ #looping through each one of the columns in DF
+    if (is.na(DF[aRow,i]) == FALSE) { #if the correlation exists, or the logical arguement is false, then run a correlation test)
+      j <- colnames(DF[i])
+      k <- rownames(DF[aRow,])
+      #performing a correlation test between a row and a column - need to make sure it doesn't compare to itself
+      Correlation_Test <- cor.test(WVS_Data_Precentages5[,k], WVS_Data_Precentages5[,j], method = "spearman")
+      P_Values <- Correlation_Test$p.value
+      R_squared <- DF[k,j]
+      Result <- cbind(rownames(DF[k,]), colnames(DF[j]), R_squared, P_Values)
+      Sig_Correlations <- rbind(Sig_Correlations, Result)
+    }
+    Result<- c()
+  }
+}
+
+dim(Sig_Correlations)
+
+#now we should delete any rows which have non-significant p-values
+Sig_Correlations_Clean <- Sig_Correlations[!(as.numeric(Sig_Correlations[,4]) > 0.05),]
+```
+
+```{r Spearman Correlation Variables}
+#Names of columns to keep in WVS_Data_Precentages5 to keep
+VariablestoKeep <- unique(c(Sig_Correlations_Clean[,1],Sig_Correlations_Clean[,2]))
+VariablestoKeep_DF <- as.data.frame(VariablestoKeep)
+str(VariablestoKeep)
+```
+
+282 variables have significante (>0.05) p-values for their correlations.  
+```{r Spearman Rank Corrleation PCA5}
+WVS_Data_Precentages5_Spearman <- WVS_Data_Precentages5[,VariablestoKeep]
+ 
+Spearman_PCA <- prcomp(WVS_Data_Precentages5_Spearman, center = TRUE, scale. = TRUE)
+summary(Spearman_PCA)
+```
+
+```{r PCA5 Scree Plot}
+plot(Spearman_PCA, type = "l")
+```
+
+```{r PCA5 Loadings}
+Spearman_PCA_Loadings <- Spearman_PCA$rotation[,c(1:5)]
+
+plot(Spearman_PCA_Loadings [,c(1,2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Reduced Spearman Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+```{r Spearman Rank Correlation PCA}
+PCA(WVS_Data_Precentages5_Spearman)
+```
+
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. No variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA5 Loadings and Scores}
+Spearman_PCA_Loadings [abs(Spearman_PCA_Loadings ) < 0.4] = NA
+PCA_Loadings_Cleaned5<- Spearman_PCA_Loadings [rowSums(is.na(Spearman_PCA_Loadings ))!= 5, ]
+head(PCA_Loadings_Cleaned5)
+
+PCA_Scores5 <- Spearman_PCA$x[,c(1:5)]
+```
+
+##Varaible Reduction: Kendall Rank Correlations
+The Kendall Rank correlation is based on discordant and concordant pairs and ties between the rankings result in a slightly different calculation of tau which is based on the difference between concordant and discordant pairs divided by the square root of the product of the difference between the unique ordered pairs and the tied rank in both set of variables. It is considered to be more resistant to error and better for smaller sample sizes. See article by Puth et al.
+```{r Kendall Rank Correlations}
+Kendall_Correlations <- cor(WVS_Data_Precentages5, method = "kendall")
+Kendall_Correlations <- as.data.frame(Kendall_Correlations)
+Kendall_Correlations[abs(Kendall_Correlations) < 0.7] = NA
+#write.csv(Kendall_Correlations, "Kendall_Correlations_0.7Cleaned.csv")
+
+#remove columns/rows which sum to 1 - because that implies that only correlate with themselves at 0.7 or higher
+Kendall_Correlations_NoCorr<- Kendall_Correlations[,-(which(colSums(Kendall_Correlations, na.rm=TRUE) == 1.00))] 
+
+#the list below is the variables to keep
+Correlated_Variables <- names(Kendall_Correlations_NoCorr)
+str(Correlated_Variables)
+
+#There are 573 varaibles that do not correlate with anything else above 0.7. They are removed from the analysis. 
+Kendall_Correlations_0.7Corr<- Kendall_Correlations[Correlated_Variables, Correlated_Variables]
+diag(Kendall_Correlations_0.7Corr) = NA
+
+#Now we want to only keep variables which have signifcant correlations beyond other variables in their question. We can do this by summing each row - excluding the variables related to the same question
+
+#For example if we sum the first row excluding the variable from V4
+sum(Kendall_Correlations_0.7Corr["V9_1_Ref",c(1:220)], na.rm=T)
+#For this  variable, this means that V9_1_Ref is correlated to something beyond other V9 questions because the sum is not zero. In this example, V9_1_Ref has mutiple relationships outside of V9. We can use a significance test to determine if this is a statistically significant relationship. We need to use the raw individual data to do the signifcance test.
+
+cor.test(WVS_Data_Precentages5$V9_1_Ref,WVS_Data_Precentages5$V49_1_Ref,method = "kendall")
+#this test results that indicates that the relationship is significant and should be explored further. 
+```
+
+From this plot it is still hard tell which correlations are outside the question. We will now remove all inter question correlations and test to see if the correlations that do result are statiscally significant
+```{r Kendall Rank Correlations Elimination}
+#we want to keep all variables with correlations (outside it's own question) in the PCA analysis. Correlations between varaibles of the same question are an artifact of the research design. 
+
+Eliminate_Kendall <- c("V4_","V4_","V8_","V8_","V9_","V9_","V9_",
+                       "V19_","V25_","V25_","V25_","V26_","V26_","V26_",
+                       "V27_","V27_","V27_","V28_","V28_","V29_",
+                       "V29_","V30_","V30_","V30_","V31_","V31_",
+                       "V31_","V32_","V32_","V32_","V33_","V33_",
+                       "V33_","V34_","V34_","V34_","V37_","V40_", 
+                       "V41_","V43_","V44_","V75_","V76_","V79_",
+                       "V79_","V45_","V45_","V102_","V102_","V49_",
+                       "V49_","V49_","V51_","V51_","V51_","V51_",
+                       "V52_","V53_","V53_","V53_","V53_","V67_",
+                       "V67_","V85_","V86_","V87_","V87_","V88_",
+                       "V88_","V89_","V108_","V108_","V110_","V110_",
+                       "V110_","V110_","V111_","V111_","V111_","V111_",
+                       "V115_","V115_","V115_","V116_","V116_","V116_",
+                       "V117_","V117_","V117_","V117_","V122_","V122_",
+                       "V122_","V122_","V123_","V123_","V123_","V123_",
+                       "V124_","V129_","V129_","V130_","V130_","V222_",
+                       "V222_","V222_","V222_","V223_","V223_","V223_",
+                       "V223_","V225_","V225_","V226_","V226_","V226_",
+                       "V227_","V227_","V227_","V146_","V147_","V147_",
+                       "V150_","V150_","V151_","V151_","V153_","V153_",
+                       "V211_","V211_","V211_","V106_","V106_","V106_",
+                       "V107_","V107_","V107_","V212_","V213_","V214_",
+                       "V214_","V243_","V244_","V172_","V172_","V175_",
+                       "V175_","V179_","V180_","V181_","V181_","V181_",
+                       "V182_","V182_","V183_","V183_","V183_","V183_",
+                       "V184_","V184_","V184_","V184_","V185_","V185_",
+                       "V185_","V188_","V188_","V188_","V189_","V189_",
+                       "V189_","V190_","V190_","V190_","V191_","V191_",
+                       "V191_","V98_","V98_","V99_","V100_", "V132_",
+                       "V132_","V198_","V198_","V198_","V200_","V200_",
+                       "V200_","V209_","V209_","V209_","V199_","V199_",
+                       "V199_","V201_","V201_","V202_","V203_","V203_",
+                       "V203_","V203_","V204_","V204_","V204_","V204_",
+                       "V205_","V205_","V205_","V207_","V207_","V207_",
+                       "V207_","V206_","V208_","V208_","V208_","V208_",
+                       "V163_","V163_")
+
+Keep <- c()
+i=1
+for (aRow in Correlated_Variables[c(1:220)]){
+  DF <- abs(Kendall_Correlations_0.7Corr[ , -grep(Eliminate_Kendall[i], colnames(Kendall_Correlations_0.7Corr))])
+  sum <- sum((DF[aRow,]), na.rm=T)
+  if(sum>0){Keep <- cbind(Keep, aRow)} #if sum of row is greater than 0, keep the row.
+  #if(is.na(sum==T)){next}
+  i=i+1
+}
+Keep <- c(Keep[1,])
+str(Keep)
+
+#The majority of the variables do not correlate with anything else and then we elimanted another 84 for only being correclated to other variables within the same question. They are removed from the analysis, leaving 136 variables.
+
+WVS_Data_Precentages5_0.7Corr<- WVS_Data_Precentages5[,Keep]
+Kendall_Correlations_0.7Corr_Reduced<- Kendall_Correlations[Keep, Keep]
+
+#now we need ensure that all these correlations (outside the variable questions to one another) are significant
+Result <- c()
+Sig_Correlations <- c()
+
+#while we know that there are 503 variables which have correlations greater than 0.7 with variables outside their own question, we recreate the orginal dataframes from the last loop in order to do a significance test. 
+
+for(aRow in c(1:220)){
+  DF <- Kendall_Correlations_0.7Corr[ , -grep(Eliminate_Kendall[aRow], colnames(Kendall_Correlations_0.7Corr))]
+  Cell <- ncol(DF)
+  i=1
+#change this to referring to column/row name so that I make sure it's the right one. 
+  for(i in c(1:Cell)){ #looping through each one of the columns in DF
+    if (is.na(DF[aRow,i]) == FALSE) { #if the correlation exists, or the logical arguement is false, then run a correlation test)
+      j <- colnames(DF[i])
+      k <- rownames(DF[aRow,])
+      #performing a correlation test between a row and a column - need to make sure it doesn't compare to itself
+      Correlation_Test <- cor.test(WVS_Data_Precentages5[,k], WVS_Data_Precentages5[,j], method = "kendall")
+      P_Values <- Correlation_Test$p.value
+      R_squared <- DF[k,j]
+      Result <- cbind(rownames(DF[k,]), colnames(DF[j]), R_squared, P_Values)
+      Sig_Correlations <- rbind(Sig_Correlations, Result)
+    }
+    Result<- c()
+  }
+}
+
+dim(Sig_Correlations)
+
+#now we should delete any rows which have non-significant p-values
+Sig_Correlations_Clean <- Sig_Correlations[!(as.numeric(Sig_Correlations[,4]) > 0.05),]
+dim(Sig_Correlations_Clean)
+#write.csv(Sig_Correlations_Clean, "Significant_Correlations.csv")
+```
+
+Looking at these correlations you can tell that there are variables that correlate strongly an entire questions and the correlation changes depending on the response of the variable. In order to reduce the amount of variables we could just take the postive relationships - selecting only one variable from each question that is positive and the strongest. 
+
+For example in the relationship between V8 (how important is work) and V9 (how important is religion), we kept V8_1 for V8 and V9_1 for V9 as they both are in the strongest, positive relationship between the two questions. The strongest relationship between the questions overall is between V8_1 and V9_4 (a negative relationship). 
+
+The problem is that these questions are related to other questions - we will choose the strongest postivie and negative relationships and then select the  single variable to represent the question based on the highest average correlation with the variables from the other questions. After we will ensure that we have not eliminated a variable which was uniquely correlated to one other variable.  
+```{r Kendall Rank Variables}
+#Names of columns to keep in WVS_Data_Precentages5 to keep
+VariablestoKeep <- unique(c(Sig_Correlations_Clean[,1],Sig_Correlations_Clean[,2]))
+VariablestoKeep_DF <- as.data.frame(VariablestoKeep)
+#write.csv(VariablestoKeep_DF, "Kendall_Correlation_Var.csv")
+
+str(VariablestoKeep)
+```
+
+All the 140 variables have significant (>0.05) p-values for their correlations. Now let's see how this reduced set of variables does BEFORE we further reduce the variables to only one variable per question. 
+```{r PCA6 Kendall Correlated Variabes PCA}
+WVS_Data_Precentages5_Kendall <- WVS_Data_Precentages5[,VariablestoKeep]
+ 
+Kendall_PCA <- prcomp(WVS_Data_Precentages5_Kendall, center = TRUE, scale. = TRUE)
+summary(Kendall_PCA)
+```
+```{r PCA6 Scree Plot}
+plot(Kendall_PCA, type = "l")
+```
+
+
+#Varaible Reduction: Kendall Rank Correlations - PCA Loadings
+```{r PCA6 Kendall Loadings}
+#Loadings have variables as rows
+KendallPCA_Loadings <- round(Kendall_PCA$rotation [,c(1:5)], 3)
+head(KendallPCA_Loadings)
+KendallPCA_Loadings <- as.data.frame(KendallPCA_Loadings)
+#write.csv(KendallPCA_Loadings, file= "KendallPCA_Loadings.csv")
+
+#Plots of Components
+#pdf("Loading distribution3.pdf", paper = "USr")
+par(mfrow=c(2,3))
+
+plot(KendallPCA_Loadings$PC1, type = "l", main = "PC1")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(KendallPCA_Loadings$PC2, type = "l", main = "PC2")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(KendallPCA_Loadings$PC3, type = "l", main = "PC3")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(KendallPCA_Loadings$PC4, type = "l", main = "PC4")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+plot(KendallPCA_Loadings$PC5, type = "l", main = "PC5")
+abline(h=0.05, col="red")
+abline(h=-0.05, col="red")
+abline(h=0.075, col="grey")
+abline(h=-0.075, col="grey")
+abline(h=0.1, col="blue")
+abline(h=-0.1, col="blue")
+
+#dev.off()
+```
+
+```{r PCA6 Unrotated}
+plot(Kendall_PCA$rotation [,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+We can try a varimax rotations to see if that helps the loadings of the variables; however, all a roatation does is change the presepective of the data. It doesn't change how the data has been reduced. 
+
+```{r PCA6 Varimax}
+Kendall.Varimax <-varimax(Kendall_PCA$rotation)
+#try regressions with national data and then try to reduce the sample to older, educated, males - see if that helps clarify results.
+head(Kendall.Varimax$loadings[,c(1:6)])
+
+plot(Kendall.Varimax$loadings[,c(1:2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+Unfortunately the loadings on these dimensions by different variables is still low, no question loads greater than .3. Hofestede's dimensions had questions loading well above that as in 0.4 to 0.6 - this is because the questions were all focused on one topic - 10 questions related to workplace goals.  From this analysis we see that many are the same as the low variance filter. One way to increase the loading and interpretation may be to choose only one variable for each question. To make this selection we would need to dig deeper into the non-parametric correlations and how the variables relate to others, as is done below.
+
+```{r Kendall Correlation Plot - Partial}
+#get rid of the correlations between variables of same questions
+for(y in c(1:220)){
+Kendall_Correlations_0.7Corr[grep(Eliminate_Kendall[y], colnames(Kendall_Correlations_0.7Corr)),
+                              grep(Eliminate_Kendall[y], colnames(Kendall_Correlations_0.7Corr))] = NA
+}
+
+library(corrplot)
+corrplot(as.matrix(Kendall_Correlations_0.7Corr[c(1:25), c(1:25) ]), 
+         na.label = "square", na.label.col = "white", tl.cex = 0.5)
+```
+```{r Kendall Correlation Plot - All}
+library(corrplot)
+corrplot(as.matrix(Kendall_Correlations_0.7Corr[c(1:100), c(1:100) ]), 
+         na.label = "square", na.label.col = "white", tl.cex = 0.5)
+```
+
+It's interesting to note that there is a clear pattern with respect to how the questions are ordered. This will become more clear when we reduce the number of variables per question to just one. 
+```{r PCA7 Kendall One Variable per Question}
+#This is just a list of the Kendall variables with the descriptions of the variables.
+Kendall.Correlation.Variable.Descriptions <- read.csv("Kendall_Correlation_Variable_Descriptions.csv")
+
+V1_Names <- merge(Sig_Correlations_Clean, Kendall.Correlation.Variable.Descriptions, by.x = "V1", by.y = "VariablestoKeep")
+
+V1_Names <- V1_Names[c("V1", "Description", "R_squared", "V2")]
+V2_Names <- merge(V1_Names, Kendall.Correlation.Variable.Descriptions, by.x = "V2", by.y = "VariablestoKeep")
+V2_Names <- V2_Names[c("V1", "Description.x", "R_squared", "V2", "Description.y")]
+#write.csv (V2_Names, "Significant_Correlations_Descriptions.csv")
+
+#This file was manually created by analyzing which correlations were the strongest between the variables within each questions and choosing one variable per questions. 
+Reduced_Variables <- read.csv("Reduced_Variables_Kendall.csv")
+Reduced_Variables <- as.matrix(Reduced_Variables)
+Reduced_Variables_List <- unique(c(Reduced_Variables[,2], Reduced_Variables[,5]))
+
+WVS_Data_Precentages5_Kendall_Clean <- WVS_Data_Precentages5[,Reduced_Variables_List]
+ 
+PCA7 <- prcomp(WVS_Data_Precentages5_Kendall_Clean, scale. = TRUE, center = TRUE)
+summary(PCA7)
+```
+
+
+
+```{r PCA7 - Kendall Single Variable per Question}
+plot(PCA7, type = "l")
+```
+
+```{r PCA7 Loadings with Descriptions}
+PCA7_Loadings <- PCA7$rotation
+PCA7_Loadings_Description <- merge(PCA7_Loadings,
+                                     Kendall.Correlation.Variable.Descriptions, by.x = 0, by.y = "VariablestoKeep" )
+
+PCA7_Loadings_Description<-PCA7_Loadings_Description[,c("Row.names", "Description", 
+                                                               "PC1", "PC2", "PC3", "PC4", "PC4")]
+```
+
+```{r PCA7 Unrotated Plot}
+plot(PCA7_Loadings[,c(1,2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Unrotated PCA7 Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+```{r PCA7 Varimax Plot}
+Kendall.Varimax <-varimax(PCA7$rotation)
+#try regressions with national data and then try to reduce the sample to older, educated, males - see if that helps clarify results.
+Kendall.Varimax.Loadings <- PCA7$loadings[,c(1:6)]
+plot(Kendall.Varimax.Loadings[,c(1,2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Varimax PCA7 Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+
+```{r PCA7 Oblmin Rotation}
+Kendall.Oblimin <- oblimin(PCA7$rotation)
+Kendall.Oblimin.Loadings <- Kendall.Oblimin$loadings
+
+plot(Kendall.Oblimin.Loadings[,c(1,2)], xlim = c(-1, 1), ylim = c(-1, 1), main = "Oblimin PCA7 Loadings")
+abline(v = 0, h = 0, lty = 2)
+```
+```{r PCA7 Variable Factor Map}
+PCA(WVS_Data_Precentages5_Kendall_Clean)
+```
+
+```{r PCA7 with Country Names}
+PCA7_Scores <- PCA7$x[,c(1:5)]
+Named_PCA7_Scores <- merge(Country_Names, PCA7_Scores, by.y= 0, by.x ="Country.Code", all.y=T)
+```
+
+It is difficult to clearly interpret the results of this PCA due to the amount of variables which are loading on to each factor and the considerable amount of cross-loading. Rotation does not help the interpretation. In order to interpret, we only consider the variables which load more than +/- 0.4 on to the factor. Very few variables loads higher than 0.4 (as shown below) in these results therefore, we do not consider it a useful model.
+
+```{r PCA7 Loadings and Scores}
+PCA7_Loadings[abs(PCA7_Loadings) < 0.4] = NA
+PCA_Loadings_Cleaned7<- PCA7_Loadings[rowSums(is.na(PCA7_Loadings))!= 5, ]
+head(PCA_Loadings_Cleaned7)
+```
+

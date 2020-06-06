@@ -1,0 +1,1188 @@
+---
+title: "05b_Grouped_MIRT_CFA"
+author: "Leigh Allison"
+date: "March 3, 2019"
+output: html_document
+---
+#Load Model
+This model was created using high power computing 
+```{r Load Packages}
+library(mirt)
+library(mirtCAT)
+library(parallel)
+library(plyr)
+library(dplyr)
+```
+
+```{r Load Data Files}
+Individual_MIRTData <- read.csv("Individual_MIRTData_NBO198.csv")
+Individual_MIRTData <- Individual_MIRTData[,c(3:202)]
+
+ItemType <- read.csv("CFA_ItemType.csv")
+```
+
+```{r Load EFA Model}
+load("C:/Users/laall/Google Drive (laalliso@uw.edu)/05 Dissertation/Paper_1/Hyak_Outputs/FINAL_5F_MODEL_EFA/Model_NBO_198Q56C_5F_EM_Short_noLarge.Rdata"
+```
+
+#Parameters
+
+##Extract the Coefficients 
+When the slope and intercept are held equal, every country should have exactly equal parameters. Therefore, you should be able to randomly choose two countries to make into csv files and they should be equivalent. 
+```{r EFA Coefficients, eval=FALSE}
+Coef_Grouped_MIRT_Model_All_Countries <- coef(Grouped_MIRT_CFA)
+names(Coef_Grouped_MIRT_Model_All_Countries)
+```
+
+##Factors Loading Paramters
+Since an item response function in not how the factor analyses are traditionally done, the coefficients are tranformed into the factor loadings that are typically interpreted. If the model allowed the variance to differ between countries, the countries will have variation in the magintude of the factor loadings; however, the order and direction of variables effect on the factor will remain the same. As is common in factor analysis, rotations are applied in order to gain a more clear prespective of the factors. In this code, no rotation, varimax rotation, and oblimin rotation are analyzed. 
+
+###Varimax Rotation
+```{r EFA Varimax Loadings & Communalities, eval=FALSE}
+#Now let's look at an varimax rotated loading
+Grouped_MIRT_Varimax_Summary <- summary(Grouped_MIRT, rotate="varimax", verbose=FALSE)
+#Need to store the coef dataframe under country name
+Summary_Names <- paste("Summary_Varimax",unique(Individual_MIRTData$V2.x),sep = "_")
+Communalities <- paste("Communalities_Varimax",unique(Individual_MIRTData$V2.x),sep = "_")
+
+n=56
+i=1
+for(i in 1:n){#loops through the countries
+  Country_Loadings <-Grouped_MIRT_Varimax_Summary[[i]] #focuses on one country
+  names(Country_Loadings)
+  Country_Loadings_Values <- as.data.frame(Country_Loadings$rotF)
+  Country_Communalitites <- as.data.frame(Country_Loadings$h2)
+  assign(Summary_Names[i], Country_Loadings_Values)
+  assign(Communalities[i], Country_Communalitites)
+  i=i+1
+}
+```
+
+Check that all countries have the same loading
+```{r Check All Countries are Equal, eval=FALSE}
+summary(Summary_Varimax_112==Summary_Varimax_196)
+```
+
+Make a list of items that load over 0.3 on any factor.
+```{r CFA Varmiax Item List 0.3 Cutoff VARIMAX, eval=FALSE}
+F1_Items <- which(abs(Summary_Varimax_112$F1)>0.3)
+F1_Items <- F1_Items #adding 2 to all the row numbers because in the original DF there are two extra columns
+cat(F1_Items, sep=",")
+
+F2_Items <- which(abs(Summary_Varimax_112$F2)>0.3)
+F2_Items <- F2_Items
+cat(F2_Items, sep=",")
+
+
+F3_Items <- which(abs(Summary_Varimax_112$F3)>0.3)
+F3_Items <- F3_Items
+cat(F3_Items, sep=",")
+
+
+F4_Items <- which(abs(Summary_Varimax_112$F4)>0.3)
+F4_Items <- F4_Items
+cat(F4_Items, sep=",")
+
+F5_Items <- which(abs(Summary_Varimax_112$F5)>0.3)
+F5_Items <- F5_Items
+cat(F5_Items, sep=",")
+
+Cutoff0.3model_Unique <- unique(Cutoff0.3model) #54 variables
+
+Reduced_DF_5F3 <- Individual_MIRTData[,colnames(Individual_MIRTData[,sort((unique(Cutoff0.3model)+2))])]
+Reduced_DF_5F3 <- cbind(Individual_MIRTData$V2.x,Individual_MIRTData$V258.x,Reduced_DF_5F3)
+#write.csv(Reduced_DF_5F3, "CFAData_5F_0.3Cutoff_54Q56C_Varimax.csv")
+
+Reduced_DF_5F3_NA <-na.omit(Reduced_DF_5F3)
+Reduced_Countries <-unique(Reduced_DF_5F3_NA$`Individual_MIRTData$V2.x`) #44 countries
+table(Reduced_DF_5F3_NA$`Individual_MIRTData$V2.x`)
+
+Reduced_DF_5F3_NA <-Reduced_DF_5F3_NA[!Reduced_DF_5F3_NA$`Individual_MIRTData$V2.x` %in% c(504,604,724,780),] 
+#40 countries
+#write.csv(Reduced_DF_5F3_NA, "CFAData_5F_0.3Cutoff_54Q56C_Complete.csv")
+
+F1_Variables <- c(30,47,61,135,136,191,192,195)
+F1_Variable_Names <- colnames(Individual_MIRTData[,(F1_Variables+2)])
+F1_Variable_Names
+#column numbers in new df
+model_col <- which(colnames(Reduced_DF_5F3_NA) %in% c(F1_Variable_Names))
+model_col-2
+
+F2_Variables <- c(1,2,3,4,5,6,7,8,9,10,11,46,94,98,191)
+F2_Variable_Names <- colnames(Individual_MIRTData[,(F2_Variables+2)])
+F2_Variable_Names
+#column numbers in new df
+model_col <- which(colnames(Reduced_DF_5F3_NA) %in% c(F2_Variable_Names))
+model_col-2
+
+F3_Variables <- c(184,185,187,188,189,190,196)
+F3_Variable_Names <- colnames(Individual_MIRTData[,(F3_Variables+2)])
+F3_Variable_Names
+#column numbers in new df
+model_col <- which(colnames(Reduced_DF_5F3_NA) %in% c(F3_Variable_Names))
+model_col-2
+
+F4_Variables <- c(99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,121)
+F4_Variable_Names <- colnames(Individual_MIRTData[,(F4_Variables+2)])
+F4_Variable_Names
+#column numbers in new df
+model_col <- which(colnames(Reduced_DF_5F3_NA) %in% c(F4_Variable_Names))
+model_col-2
+
+F5_Variables <- c(151,152,153,154,155,156)
+F5_Variable_Names <- colnames(Individual_MIRTData[,(F5_Variables+2)])
+F5_Variable_Names
+#column numbers in new df
+model_col <- which(colnames(Reduced_DF_5F3_NA) %in% c(F5_Variable_Names))
+model_col-2
+
+model = 'F1 = 12,14,15,37,38,51,52,53
+         F2 = 1,2,3,4,5,6,7,8,9,10,11,13,16,17,51
+         F3 = 45,46,47,48,49,50,54
+         F4 = 18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+         F5 = 39,40,41,42,43,44'
+```
+
+```{r Create CFA Model 0.3 Cutoff VARIMAX, eval=FALSE}
+Reduced_DF_5F3<- read.csv("CFAData_5F_0.3Cutoff_54Q56C_Varimax.csv")
+Reduced_DF_5F3<-Reduced_DF_5F3[,c(2:ncol(Reduced_DF_5F3))]
+
+model = 'F1 = 12,14,15,37,38,51,52,53
+         F2 = 1,2,3,4,5,6,7,8,9,10,11,13,16,17,51
+         F3 = 45,46,47,48,49,50,54
+         F4 = 18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+         F5 = 39,40,41,42,43,44'
+
+ItemType <- c("2PL", "2PL", "2PL", "2PL", "2PL", "2PL", "2PL", "2PL", 
+            "2PL", "2PL", "2PL", "2PL", "2PL", "2PL", 
+            "graded", "graded","graded", "graded", "graded", "graded",
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded", "graded",
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded")
+
+#oad("StartingParameters_5F_0.3Cutoff_54Q56C_NC3V.Rdata")
+
+Grouped_MIRT_CFA_5F_NC3V<- multipleGroup(Reduced_DF_5F3[,c(3:ncol(Reduced_DF_5F3))], 
+                                  model = model,
+                                  group = as.character(Reduced_DF_5F3$`Individual_MIRTData.V2.x`),
+                                  invariance = c("slopes","intercepts","free_means"),
+                                  itemtype=ItemType,
+                                  method = "EM", pars=Parameters,
+                                  technical=list(NCYCLES=25), 
+                                  survey.weights = Reduced_DF_5F3$`Individual_MIRTData.V258.x`)
+
+Parameters <- mod2values(Grouped_MIRT_CFA_5F_NC3V)
+
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S") 
+filename <-  paste("Parameters_5F_0.3Cutoff_54Q56C_NC3V",timestamp,".Rdata",sep="")
+
+save(Parameters  ,file=filename)
+save(Parameters , file="StartingParameters_5F_0.3Cutoff_54Q56C_NC3V.Rdata")
+```
+
+```{r Load CFA Model 0.3 Cutoff VARIMAX Hyak}
+#Load Model from Hyak
+load("C:/Users/laall/Google Drive (laalliso@uw.edu)/05 Dissertation/Paper_1/Hyak_Outputs/FINAL_5F_MODEL_CFA/NC3V/Model_N5F_0.3Cutoff_54Q56C_NC3V.Rdata")
+```
+
+```{r Extract Model Coefficients}
+#Create Latent Mean Dataframe
+Coef_Model <- coef(Grouped_MIRT_CFA_5F_NC3V)
+names(Coef_Model)
+
+#in order to see the results from hyak, we need to export the results to a csv file. If you export it as is or even just a single country. 
+#It is a sinlge row with all the paramters going across. We need to be simplify this so that each variable is a row and 
+#the columns are labelled with the parameters. Normally you can say simplify equals true for a single country in the coef function. 
+#Each country is listed by it's country code
+
+#Need to store the coef dataframe under country name
+Coef_Names <- names(Coef_Model)
+LatentMV_Names <- names(Coef_Model)
+LatentMV_Names
+Latent_MV_All <- c()
+
+i=1
+j=1
+n=56 #number of countries
+m=54 #number of variables
+v=m+1 #row of mean and variances for each latent trait
+
+for(i in 1:n){#loops through the countries
+  Country_Coef <- Coef_Model[[i]] #focuses on one country
+  #this data frame will be used to store the coefficients
+  Variables_Coef_All <- c()
+  for(j in 1:m){#loop through all variables
+    Variables_Coef <- as.data.frame(do.call(rbind.data.frame, Country_Coef[j]))
+    Variables_Coef_All <- rbind.fill(Variables_Coef_All, Variables_Coef)
+    j=j+1
+    }
+    Latent_MeanVar <- as.data.frame(do.call(rbind.data.frame, Country_Coef[v]))
+    Latent_MV_All <- rbind(Latent_MV_All,Latent_MeanVar)
+    
+  rownames(Variables_Coef_All)<- names(Country_Coef[c(1:m)])
+  assign(Coef_Names[i], as.data.frame(Variables_Coef_All))
+  filename=paste(Coef_Names[i],".csv",sep="")
+  #write.csv(Variables_Coef_All, filename)
+  i=i+1
+}
+
+rownames(Latent_MV_All)<- LatentMV_Names
+CountryLatentMeans<- merge(Country_Names, Latent_MV_All, by.x ="Country.Code", by.y = "X")
+#write.csv(CountryLatentMeans, "Latent_MeanVar_NC3V.csv")
+```
+
+```{r Global Fit 0.3 Cutoff VARIMAX Hyak}
+#Calculate model fit from global data
+Parameters <- mod2values(Grouped_MIRT_CFA_5F_NC3V)
+#write.csv(Parameters, "Parameters.csv")
+
+#the cutoff row changes depending on the number of parameters that were estimated. Look in Parameters.csv to determine when group 1 ends.
+Pars_Global <- Parameters[c(1:464),] 
+Pars_Global$group<-"all"
+head(Pars_Global)
+
+Reduced_DF<- read.csv("CFAData_5F_0.3Cutoff_54Q56C_Varimax.csv")
+Reduced_DF<-Reduced_DF[,c(2:ncol(Reduced_DF))]
+
+model = 'F1 = 12,14,15,37,38,51,52,53
+         F2 = 1,2,3,4,5,6,7,8,9,10,11,13,16,17,51
+         F3 = 45,46,47,48,49,50,54
+         F4 = 18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+         F5 = 39,40,41,42,43,44'
+
+ItemType <- c("2PL", "2PL", "2PL", "2PL", "2PL", "2PL", "2PL", "2PL", 
+            "2PL", "2PL", "2PL", "2PL", "2PL", "2PL", 
+            "graded", "graded","graded", "graded", "graded", "graded",
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded", "graded",
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded", "graded", 
+            "graded", "graded", "graded", "graded")
+
+obj <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],model = model, 
+	          itemtype = ItemType,TOL=NA,
+            method="EM", 
+	          survey.weights=Reduced_DF$`Individual_MIRTData.V258.x`,
+          	pars=Pars_Global)
+
+#Check the model fit 
+# (na.rm will remove all responses with missing values, since we are using global data set; 
+# it may not matter as much as it did for each group, but since unnessary variables are in this data
+# this caluclation will remove more responses than neccessary)
+
+M2(obj, type="M2*", QMC=TRUE, na.rm=TRUE)
+summary(obj)
+obj@Fit
+
+#Calculate Factors Scores
+#In order to compare the results across countries we need to calculate a country score value. 
+Scores<- cbind(Reduced_DF$Individual_MIRTData.V2.x,
+                            fscores(Grouped_MIRT_CFA_5F_NC3V, method="MAP"))
+
+#write.csv(Scores, "5F_CFA_Scores_NC3V.csv")
+```
+
+##Oblimin Rotation
+Make a list of items that load over 0.3 on any factor from the Oblimin Rotation.
+```{r Oblimin EFA Loadings & Communalities, eval=FALSE}
+#Now let's look at an oblimin rotated loading
+Grouped_MIRT_Model_All_Countries_Summary <- summary(Grouped_MIRT, rotate="oblimin")
+#Need to store the coef dataframe under country name
+Summary_Names <- paste("Summary_Oblimin",unique(Individual_MIRTData$V2.x),sep = "_")
+#Communalities <- paste("Communalities_Oblimin",unique(Individual_MIRTData$V2.x),sep = "_")
+
+n=56
+i=1
+for(i in 1:n){#loops through the countries
+  Country_Loadings <- Grouped_MIRT_Model_All_Countries_Summary[[i]] #focuses on one country
+  names(Country_Loadings)
+  Country_Loadings_Values <- as.data.frame(Country_Loadings$rotF)
+  #Country_Communalitites <- as.data.frame(Country_Loadings$h2)
+  assign(Summary_Names[i], Country_Loadings_Values)
+  assign(Communalities[i], Country_Communalitites)
+  i=i+1
+}
+```
+
+```{r CFA Oblimin Item List 0.3 Cutoff OBLIMIN, eval=FALSE}
+F1_Items <- which(abs(Summary_Oblimin_112$F1)>0.3)
+cat(F1_Items, sep=",")
+F1_Variable_Names <- colnames(Individual_MIRTData[,(F1_Items+2)])
+F1_Variable_Names
+
+F2_Items <- which(abs(Summary_Oblimin_112$F2)>0.3)
+cat(F2_Items, sep=",")
+F2_Variable_Names <- colnames(Individual_MIRTData[,(F2_Items+2)])
+F2_Variable_Names
+
+F3_Items <- which(abs(Summary_Oblimin_112$F3)>0.3)
+cat(F3_Items, sep=",")
+F3_Variable_Names <- colnames(Individual_MIRTData[,(F3_Items+2)])
+F3_Variable_Names
+
+F4_Items <- which(abs(Summary_Oblimin_112$F4)>0.3)
+cat(F4_Items, sep=",")
+F4_Variable_Names <- colnames(Individual_MIRTData[,(F4_Items+2)])
+F4_Variable_Names
+
+F5_Items <- which(abs(Summary_Varimax_112$F5)>0.3)
+cat(F5_Items, sep=",")
+F5_Variable_Names <- colnames(Individual_MIRTData[,(F5_Items+2)])
+F5_Variable_Names
+
+Oblimin_0.3Cutoff <- c(F1_Items, F2_Items, F3_Items, F4_Items, F5_Items)
+Oblimin_0.3Cutoff_Unique <- unique(Oblimin_0.3Cutoff) #55 variables
+
+Reduced_DF <- Individual_MIRTData[,colnames(Individual_MIRTData[,sort((unique(Oblimin_0.3Cutoff)+2))])]
+Reduced_DF<- cbind(Individual_MIRTData$V2.x,Individual_MIRTData$V258.x,Reduced_DF)
+#write.csv(Reduced_DF, "CFAData_5F_0.3Cutoff_55Q56C_Oblimin.csv")
+
+#Column numbers in new df
+model_col <- which(colnames(Reduced_DF) %in% c(F1_Variable_Names))
+colnames(Reduced_DF[,c(model_col)])
+cat(model_col-2, sep=",")
+
+model_col <- which(colnames(Reduced_DF) %in% c(F2_Variable_Names))
+colnames(Reduced_DF[,c(model_col)])
+cat(model_col-2, sep=",")
+
+model_col <- which(colnames(Reduced_DF) %in% c(F3_Variable_Names))
+colnames(Reduced_DF[,c(model_col)])
+cat(model_col-2, sep=",")
+
+model_col <- which(colnames(Reduced_DF) %in% c(F4_Variable_Names))
+colnames(Reduced_DF[,c(model_col)])
+cat(model_col-2, sep=",")
+
+model_col <- which(colnames(Reduced_DF) %in% c(F5_Variable_Names))
+colnames(Reduced_DF[,c(model_col)])
+cat(model_col-2, sep=",")
+
+ItemType_ReducedDF <-ItemType[ItemType$item %in% c(colnames(Reduced_DF)),]
+ItemType_ReducedDF <-as.character(ItemType_ReducedDF$itemType)
+#cat(paste(shQuote(ItemType_ReducedDF$itemType, type="cmd"), collapse=", "))
+
+model='F1 = 12,13,15,16,17,37,38,39,52,53,54
+       F2 = 1,2,3,4,5,6,7,8,9,10,11,14,18,52
+       F3 = 46,47,48,49,50,51,55
+       F4 = 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+       F5 = 40,41,42,43,44,45
+      COV = F1 * F2 * F3 * F4 *F5'
+```
+
+Model with all the factors being correlated will create a non-postive latent trait matrix and fail. 
+```{r Create CFA Model 0.3 Cutoff CORRELATED OBLIMIN, eval=FALSE}
+#load the files that are relevant to your subset
+Reduced_DF<- read.csv("CFAData_5F_0.3Cutoff_55Q56C_Oblimin.csv")
+Reduced_DF<- Reduced_DF[,c(2:ncol(Reduced_DF))]
+
+ItemType <- read.csv("CFA_ItemType.csv")
+
+model='F1 = 12,13,15,16,17,37,38,39,52,53,54
+       F2 = 1,2,3,4,5,6,7,8,9,10,11,14,18,52
+       F3 = 46,47,48,49,50,51,55
+       F4 = 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+       F5 = 40,41,42,43,44,45
+       COV = F1 * F2 * F3 * F4 *F5'
+
+ItemType_ReducedDF <-ItemType[ItemType$item %in% c(colnames(Reduced_DF)),]
+ItemType_ReducedDF <-as.character(ItemType_ReducedDF$itemType)
+  
+#Print the number of columns you have - subtract 2 to get the number of variables in the DF
+ncol(Reduced_DF)
+
+#with highly correlated factors -try a different optimizer, such as 'nlminb', which tends to be more stable in highly 
+#correlated parameter spaces (though it's noticeably slower).  
+#optimizer='nlminb'
+
+Grouped_MIRT_CFA_5F<- multipleGroup(Reduced_DF[,c(3:ncol(Reduced_DF))], 
+                                  model = model,
+                                  itemtype=ItemType_ReducedDF,
+                                  group = as.character(Reduced_DF$`Individual_MIRTData.V2.x`),
+                                  invariance = c("slopes","intercepts","free_means"),
+                                  method = "EM", 
+                                  technical = list(NCYCLES=25),
+                                  survey.weights = Reduced_DF$`Individual_MIRTData.V258.x`)
+
+
+Parameters <- mod2values(Grouped_MIRT_CFA_5F)
+
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S") 
+filename <-  paste("Parameters_5F_CFA",timestamp,".Rdata",sep="")
+
+save(Parameters  ,file=filename)
+save(Parameters , file="StartingParameters_5F_CFA.Rdata")
+
+Grouped_MIRT_CFA_5F@Fit
+
+summary(Grouped_MIRT_CFA_5F)
+
+#save model - nice to update the model name to something more descriptive
+save(Grouped_MIRT_CFA_5F, file="Model_5F_CFA.Rdata")
+```
+
+```{r Create CFA Model 0.3 Cutoff NONCORRELATED OBLIMIN, eval=FALSE}
+#load the files that are relevant to your subset
+Reduced_DF<- read.csv("CFAData_5F_0.3Cutoff_55Q56C_Oblimin.csv")
+Reduced_DF<- Reduced_DF[,c(2:ncol(Reduced_DF))]
+
+ItemType <- read.csv("CFA_ItemType.csv")
+
+model='F1 = 12,13,15,16,17,37,38,39,52,53,54
+       F2 = 1,2,3,4,5,6,7,8,9,10,11,14,18,52
+       F3 = 46,47,48,49,50,51,55
+       F4 = 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+       F5 = 40,41,42,43,44,45'
+
+ItemType_ReducedDF <-ItemType[ItemType$item %in% c(colnames(Reduced_DF)),]
+ItemType_ReducedDF <-as.character(ItemType_ReducedDF$itemType)
+  
+#Print the number of columns you have - subtract 2 to get the number of variables in the DF
+ncol(Reduced_DF)
+
+#with highly correlated factors -try a different optimizer, such as 'nlminb', which tends to be more stable in highly 
+#correlated parameter spaces (though it's noticeably slower).  
+#optimizer='nlminb'
+
+Grouped_MIRT_CFA_5F<- multipleGroup(Reduced_DF[,c(3:ncol(Reduced_DF))], 
+                                  model = model,
+                                  itemtype=ItemType_ReducedDF,
+                                  group = as.character(Reduced_DF$`Individual_MIRTData.V2.x`),
+                                  invariance = c("slopes","intercepts","free_means"),
+                                  method = "EM", 
+                                  technical = list(NCYCLES=25),
+                                  survey.weights = Reduced_DF$`Individual_MIRTData.V258.x`)
+
+
+Parameters <- mod2values(Grouped_MIRT_CFA_5F)
+
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S") 
+filename <-  paste("Parameters_5F_CFA",timestamp,".Rdata",sep="")
+
+save(Parameters  ,file=filename)
+save(Parameters , file="StartingParameters_5F_CFA.Rdata")
+
+Grouped_MIRT_CFA_5F@Fit
+
+summary(Grouped_MIRT_CFA_5F)
+
+#save model - nice to update the model name to something more descriptive
+save(Grouped_MIRT_CFA_5F, file="Model_5F_CFA.Rdata")
+```
+These CFA models can be estimated with EM, MCEM, and QMCEM. We tested all three and they all provided similar results with the EM and QMCEM providing the most consistency.
+
+#Final CFA Model
+```{r}
+model='F1 = 12,13,15,16,17,37,38,39,52,53,54
+       F2 = 1,2,3,4,5,6,7,8,9,10,11,14,18,52
+       F3 = 46,47,48,49,50,51,55
+       F4 = 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+       F5 = 40,41,42,43,44,45'
+```
+
+```{r load CFA Models}
+#CFA - Named Grouped_MIRT_CFA_5F
+#Grouped_MIRT_CFA_5F
+sink(file="Grouped_MIRT_CFA_5F_FINAL_NC3O.txt")
+summary(Grouped_MIRT_CFA_5F)
+sink(NULL)
+```
+
+#Global Fit Results for CFA model
+The multiple group models do not have enough responses within each country to calculate RMSEA or CFI or TLI, particuarly because missing data is not allowed.  Therefore, we transformed the multiple group model into a single group model.  We did this by transferring the parameters from the multipleGroup model to a single group model. We forced the model to converge instantly resulting in the same parameters in the global model as was modelled in each country. (Remember that we held the slope and intercept constant between all countries). 
+```{r Global for M2 Fit, eval=FALSE}
+model='F1 = 12,13,15,16,17,37,38,39,52,53,54
+       F2 = 1,2,3,4,5,6,7,8,9,10,11,14,18,52
+       F3 = 46,47,48,49,50,51,55
+       F4 = 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+       F5 = 40,41,42,43,44,45'
+
+Reduced_DF<- read.csv("CFAData_5F_0.3Cutoff_55Q56C_Oblimin.csv")
+Reduced_DF<- Reduced_DF[,c(2:ncol(Reduced_DF))]
+
+ItemType <- read.csv("CFA_ItemType.csv")
+
+ItemType_ReducedDF <-ItemType[ItemType$item %in% c(colnames(Reduced_DF)),]
+ItemType_ReducedDF <-as.character(ItemType_ReducedDF$itemType)
+
+Parameters <- mod2values(Grouped_MIRT_CFA_5F)
+
+#the cutoff row changes depending on the number of parameters that were estimated. Look in Parameters.csv to determine when group 1 ends.
+Pars_Global <- Parameters[c(1:472),] 
+Pars_Global$group<-"all"
+head(Pars_Global)
+
+
+obj <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+            model = model,
+            itemtype = ItemType_ReducedDF,
+            TOL=NA,
+            method="EM", 
+            survey.weights=Reduced_DF$`Individual_MIRTData.V258.x`,
+            pars=Pars_Global)
+
+summary(obj)
+obj@Fit
+
+#Check the model fit 
+# (na.rm will remove all responses with missing values, since we are using global data set; 
+# it may not matter as much as it did for each group, but since unnessary variables are in this data
+# this caluclation will remove more responses than neccessary)
+
+M2(obj, type="M2*", QMC=TRUE, na.rm=TRUE)
+
+
+```
+
+
+In the CFA the first 3 factors switched directionality; however, for interpretation purposes we'd like to flip it back. So we will multiply the loadings (slope parameters) for factors 1, 2, 3 as well as their means and variances by -1.
+```{r Tranformed Global - Invert F1, F2, F3}
+#Need to change values related to F1, F2, F3, in parameters in DF or could use a coef_df and multiply by the columns by -1 then repeat the 472 rows 56 times
+
+Reduced_DF<- read.csv("CFAData_5F_0.3Cutoff_55Q56C_Oblimin.csv")
+Reduced_DF<- Reduced_DF[,c(2:ncol(Reduced_DF))]
+
+ItemType <- read.csv("CFA_ItemType.csv")
+ItemType_ReducedDF <-ItemType[ItemType$item %in% c(colnames(Reduced_DF)),]
+ItemType_ReducedDF <-as.character(ItemType_ReducedDF$itemType)
+
+Parameters_Transformed <- Parameters[c(1:472),]
+
+for(i in 1:472){
+  if(Parameters$name[[i]]=="a1"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+    else{
+      if(Parameters$name[[i]]=="a2"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+      else{if(Parameters$name[[i]]=="a3"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+      }}}
+
+for(i in 1:472){
+  if(Parameters$name[[i]]=="MEAN_1"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+    else{
+      if(Parameters$name[[i]]=="MEAN_2"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+      else{if(Parameters$name[[i]]=="MEAN_3"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+      }}}
+
+for(i in 1:472){
+  if(Parameters$name[[i]]=="COV_41"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+    else{
+      if(Parameters$name[[i]]=="COV_51"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+      else{if(Parameters$name[[i]]=="COV_42"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+      else{if(Parameters$name[[i]]=="COV_52"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}  
+      else{if(Parameters$name[[i]]=="COV_43"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}  
+      else{if(Parameters$name[[i]]=="COV_53"){Parameters_Transformed$value[[i]] <- Parameters$value[[i]]*-1}
+      }}}}}}
+
+Parameters_Transformed$group <- "all"
+
+model='F1 = 12,13,15,16,17,37,38,39,52,53,54
+       F2 = 1,2,3,4,5,6,7,8,9,10,11,14,18,52
+       F3 = 46,47,48,49,50,51,55
+       F4 = 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+       F5 = 40,41,42,43,44,45'
+
+Transformed_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Parameters_Transformed)
+
+Global_Parameters <- mod2values(Transformed_Model_Global)
+```
+
+```{r}
+M2(Transformed_Model_Global, type="M2*", na.rm = TRUE, QMC=TRUE)
+```
+
+```{r Transform Grouped - Invert F1, F2, F3, eval=FALSE}
+#to transform for the grouped model will need to create a loop that transforms all a1,a2,a3 parameters a multiple by -1
+Parameters_Transformed_Grouped<- Parameters
+m <- nrow(Parameters)
+for(i in 1:m){
+  if(Parameters$name[[i]]=="a1"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+    else{
+      if(Parameters$name[[i]]=="a2"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+      else{if(Parameters$name[[i]]=="a3"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+        }}}
+
+for(i in 1:m){
+  if(Parameters$name[[i]]=="MEAN_1"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+    else{
+      if(Parameters$name[[i]]=="MEAN_2"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+      else{if(Parameters$name[[i]]=="MEAN_3"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+      }}}
+
+for(i in 1:m){
+  if(Parameters$name[[i]]=="COV_41"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+    else{
+      if(Parameters$name[[i]]=="COV_51"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+      else{if(Parameters$name[[i]]=="COV_42"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+      else{if(Parameters$name[[i]]=="COV_52"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}  
+      else{if(Parameters$name[[i]]=="COV_43"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}  
+      else{if(Parameters$name[[i]]=="COV_53"){Parameters_Transformed_Grouped$value[[i]] <- Parameters$value[[i]]*-1}
+        }}}}}}
+
+model='F1 = 12,13,15,16,17,37,38,39,52,53,54
+       F2 = 1,2,3,4,5,6,7,8,9,10,11,14,18,52
+       F3 = 46,47,48,49,50,51,55
+       F4 = 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+       F5 = 40,41,42,43,44,45'
+
+Transformed_Model <- multipleGroup(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      group = as.character(Reduced_DF$Individual_MIRTData.V2.x),
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA, method = "EM",
+                      invariance = c("slopes","intercepts","free_means"),
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Parameters_Transformed_Grouped)
+#Error: cannot allocate vector of size 5.2 Gb
+Transformed_Summary <- summary(Transformed_Model)
+```
+
+```{r CFA Model Final Parameters}
+sink(file="Grouped_MIRT_CFA_5F_FINAL_NC3O_Transformed.txt")
+summary(Transformed_Model)
+#Print out the model fit
+Transformed_Model@Fit
+sink(NULL)
+
+#Each group has a different mean latent value (variance was held to 1 for all groups)
+Coef_Model <- mirt::coef(Transformed_Model)
+names(Coef_Model)
+
+#in order to see the results from hyak, we need to export the results to a csv file. If you export it as is or even just a single country. 
+#It is a single row with all the paramters going across. We need to be simplify this so that each variable is a row and 
+#the columns are labelled with the parameters. Normally you can say simplify equals true for a single country in the coef function. 
+#Each country is listed by it's country code
+
+#Need to store the coef dataframe under country name
+Coef_Names <-  paste("Coef", names(Coef_Model), sep = "_")
+LatentMV_Names <- names(Coef_Model)
+LatentMV_Names 
+Latent_MV_All <- c()
+
+i=1
+j=1
+n=56 #number of countries
+m=55 #number of variables
+v=m+1 #row of mean and variances for each latent trait
+
+for(i in 1:n){#loops through the countries
+  Country_Coef <- Coef_Model[[i]] #focuses on one country
+  #this data frame will be used to store the coefficients
+  Variables_Coef_All <- c()
+  for(j in 1:m){#loop through all variables
+    Variables_Coef <- as.data.frame(do.call(rbind.data.frame, Country_Coef[j]))
+    Variables_Coef_All <- rbind.fill(Variables_Coef_All, Variables_Coef)
+    j=j+1
+    }
+    Latent_MeanVar <- as.data.frame(do.call(rbind.data.frame, Country_Coef[v]))
+    Latent_MV_All <- rbind(Latent_MV_All,Latent_MeanVar)
+    
+  rownames(Variables_Coef_All)<- names(Country_Coef[c(1:m)])
+  #assign(Coef_Names[i], as.data.frame(Variables_Coef_All))
+  filename=paste(Coef_Names[i],".csv",sep="")
+  #write.csv(Variables_Coef_All, filename)
+  i=i+1
+}
+
+rownames(Latent_MV_All)<- LatentMV_Names
+
+#Add country names to aggregates
+Transformed_LatentMeans<- merge(Country_Names, Latent_MV_All, by.x ="Country.Code", by.y = 0)
+write.csv(Transformed_LatentMeans, "Transformed_Latent_MeanVar_NCO3.csv")
+
+Transformed_Summary_Global <- summary(Transformed_Model_Global, verbose=FALSE)
+Transformed_Summary <- summary(Transformed_Model, verbose=FALSE)
+summary(Transformed_Summary_Global$rotF == Transformed_Summary[[1]]$rotF)
+
+CFA_Loadings <- Transformed_Summary_Global$rotF
+write.csv(CFA_Loadings, "CFA_Loadings_NC3O_Transformed.csv")
+```
+
+#Country Scores
+The output of hyak was individual scores; however, our analysis is at the country level. 
+```{r CFA Country Scores NC30}
+#Load score .csv files from Hyak
+#CFA_Hyak_Scores<- read.csv("5F_CFA_Scores_NCV3.csv") #MAP method
+
+#Transformed_Scores
+#Transformed_Fscores<- fscores(Transformed_Model, method = "MAP", QMC=TRUE)
+Transformed_Fscores <- read.csv("5F_CFA_Scores_NC3O_Transformed_Model.csv")
+
+Scores_All<- cbind(Individual_MIRTData$V2.x,Individual_MIRTData$V258.x,
+                            Transformed_Fscores[,c(3:7)])
+
+colnames(Scores_All) <- c("Individual_MIRTData$V2.x","Individual_MIRTData$V258.x",
+                          "F1", "F2", "F3", "F4", "F5")
+print("F1 Summary")
+summary(Scores_All$F1)
+print("F2 Summary")
+summary(Scores_All$F2)
+print("F3 Summary")
+summary(Scores_All$F3)
+print("F4 Summary")
+summary(Scores_All$F4)
+print("F5 Summary")
+summary(Scores_All$F5)
+```
+
+```{r Mean Country Scores}
+#Now let's calculate the mean and standard deviation of each country on each new factor.
+Scores_All<-as.data.frame(Scores_All)
+Countries <- list(Scores_All[,1])
+
+Country_Codes <- unique(Scores_All$`Individual_MIRTData$V2.x`)
+
+All_Means <- c()
+for(i in Country_Codes){
+  Country_Scores <- Scores_All[Scores_All$`Individual_MIRTData$V2.x` == i,]
+  Mean_F1 <- mean(Country_Scores$F1)
+  WeightedMean_F1 <- weighted.mean(Country_Scores$F1,Country_Scores$`Individual_MIRTData$V258.x`)
+  
+  Mean_F2 <- mean(Country_Scores$F2)
+  WeightedMean_F2 <- weighted.mean(Country_Scores$F2,Country_Scores$`Individual_MIRTData$V258.x`)
+  
+  Mean_F3 <- mean(Country_Scores$F3)
+  WeightedMean_F3 <- weighted.mean(Country_Scores$F3,Country_Scores$`Individual_MIRTData$V258.x`)
+  
+  Mean_F4 <- mean(Country_Scores$F4)
+  WeightedMean_F4 <- weighted.mean(Country_Scores$F4,Country_Scores$`Individual_MIRTData$V258.x`)
+  
+  Mean_F5 <- mean(Country_Scores$F5)
+  WeightedMean_F5<- weighted.mean(Country_Scores$F5,Country_Scores$`Individual_MIRTData$V258.x`)
+  
+  Means <- cbind(i,Mean_F1,Mean_F2,Mean_F3, Mean_F4, Mean_F5,
+                 WeightedMean_F1,WeightedMean_F2,WeightedMean_F3, WeightedMean_F4,
+                 WeightedMean_F5)
+  All_Means <- rbind(All_Means, Means)
+}
+
+Country_Names <-read.csv("Country_Code_Names.csv")
+Country_Names <-Country_Names[,c("Country.Code", "Country.Title")]
+
+#Add country names to aggregates
+CountryMeans<- merge(Country_Names,All_Means, by.x ="Country.Code", by.y = "i")
+
+write.csv(CountryMeans, "Transformed_CountryMeans_CFA_5F_NC3O.csv")
+
+```
+
+```{r CFA Country Scores Correlations}
+#Create DF with all correlations and p.values
+Correlation_DF <- c()
+Correlation_DF_Complete <- t(data.frame(0,0,0,0,0))
+for(i in 8:12){ #loop through all columns
+  for(j in 8:12){ #loop through all rows
+    Cor_test <- cor.test(CountryMeans[,i], as.numeric(CountryMeans[,j]))
+    Correlation_Col <- as.data.frame(cbind(Cor_test$estimate, Cor_test$p.value))
+    Correlation_DF <- rbind(Correlation_DF, Correlation_Col)
+    }
+    Parameter2 <- paste(i,"Correlation",sep="_")
+    Parameter3 <- paste(i, "P.value", sep="_")
+    colnames(Correlation_DF) <- c(Parameter2,Parameter3)
+    
+    Correlation_DF_Complete <- cbind(Correlation_DF_Complete, Correlation_DF)
+    row.names(Correlation_DF_Complete) <- colnames(CountryMeans[,c(8:12)])
+    Correlation_DF <- c()
+}
+```
+
+```{r CFA Correlations}
+Compare <- merge(Latent_MV_All, CountryMeans, by.x=0, by.y="Country.Code")
+#we would expect that latent mean and the weighted country scores are equivalent (p.value greater than 0.05)
+t.test(Compare$MEAN_1, Compare$WeightedMean_F1)
+t.test(Compare$MEAN_2, Compare$WeightedMean_F2)
+t.test(Compare$MEAN_3, Compare$WeightedMean_F3)
+t.test(Compare$MEAN_4, Compare$WeightedMean_F4)
+t.test(Compare$MEAN_5, Compare$WeightedMean_F5)
+#true in all cases
+
+#conversely we would expect high correlations and significant p.values for the correlation test.
+cor.test(Compare$MEAN_1, Compare$WeightedMean_F1)
+cor.test(Compare$MEAN_2, Compare$WeightedMean_F2)
+cor.test(Compare$MEAN_3, Compare$WeightedMean_F3)
+cor.test(Compare$MEAN_4, Compare$WeightedMean_F4)
+cor.test(Compare$MEAN_5, Compare$WeightedMean_F5)
+#true in all cases (although F5 is only 0.88 in correlation)
+```
+
+#Item Fit by Factor 
+```{r Item List}
+item_parameters <- as.data.frame(table(Parameters$item[c(1:472)]))
+#all the values in this list are based off having 5 factors, will need to subtract 5 (8-4=4) in order to get the correct number of parameters per item.  
+table(Parameters_Transformed$item)
+
+
+itemlist <- c()
+for(i in 3:ncol(Reduced_DF)){
+ if(colnames(Reduced_DF)[i] == "V146"){item <- rep(colnames(Reduced_DF)[i],8)}
+  else{
+    if(colnames(Reduced_DF)[i] %in% c("V85","V89","V147")){item <- rep(colnames(Reduced_DF)[i],3)}
+    else {
+      if(colnames(Reduced_DF)[i] %in% c("V198","V199","V200","V201","V202","V202","V203","V204",
+                                  "V205","V206","V207","V208","V209","V210"))
+                                  {item <- rep(colnames(Reduced_DF)[i],5)}  
+     else  {item <- rep(colnames(Reduced_DF)[i],4)} 
+    }
+  }
+ itemlist <- c(itemlist, item)}
+ itemlist <- c(itemlist, "GROUP","GROUP")
+```
+
+```{r Factor 1 - Item Fit}
+Parameters_F1 <- Coef_112[c(1:55),c(1,6:15)]
+Parameters <- mod2values(Transformed_Model)
+
+ItemType <- read.csv("CFA_ItemType.csv")
+ItemType_ReducedDF <-ItemType[ItemType$item %in% c(colnames(Reduced_DF)),]
+ItemType_ReducedDF <-as.character(ItemType_ReducedDF$itemType)
+
+#while this does create the model, it does not have any data
+Factor1_Model <- generate.mirt_object(Parameters_F1,ItemType_ReducedDF)
+Factor1_Parameters <- mod2values(Factor1_Model)
+
+#after creating a second list of item parameters, a new model can be made. 
+Factor1_Parameters$item <- itemlist
+
+model <-  ' = 12,13,15,16,17,37,38,39,52,53,54'
+
+Factor1_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor1_Parameters)
+
+#which items should be a plot be created  = 12,13,15,16,17,37,38,39,52,53,54
+colnames(Reduced_DF [,(c(12,13,15,16,17,37,38,39,52,53,54)+2)])
+pdf("Factor1_ItemFit_NC3O.pdf")
+par(mfrow=c(6,2))
+itemfit(Factor1_Model_Global, empirical.plot = 12)
+itemfit(Factor1_Model_Global, empirical.plot = 13)
+itemfit(Factor1_Model_Global, empirical.plot = 15)
+itemfit(Factor1_Model_Global, empirical.plot = 16)
+itemfit(Factor1_Model_Global, empirical.plot = 17)
+itemfit(Factor1_Model_Global, empirical.plot = 37)
+itemfit(Factor1_Model_Global, empirical.plot = 38)
+itemfit(Factor1_Model_Global, empirical.plot = 39)
+itemfit(Factor1_Model_Global, empirical.plot = 52)
+itemfit(Factor1_Model_Global, empirical.plot = 53)
+itemfit(Factor1_Model_Global, empirical.plot = 54)
+dev.off()
+```
+
+```{r Factor 1 - Item Fit, Varimax, eval=FALSE}
+Parameters_F1 <- Coef_112[c(1:54),c(1,6:15)]
+Parameters <- mod2values(Transformed_Model)
+
+ItemType <- read.csv("CFA_ItemType.csv")
+ItemType_ReducedDF <-ItemType[ItemType$item %in% c(colnames(Reduced_DF)),]
+ItemType_ReducedDF <-as.character(ItemType_ReducedDF$itemType)
+
+#while this does create the model, it does not have any data
+Factor1_Model <- generate.mirt_object(Parameters_F1,ItemType_ReducedDF)
+Factor1_Parameters <- mod2values(Factor1_Model)
+
+#after creating a second list of item parameters, a new model can be made. 
+Factor1_Parameters$item <- itemlist
+
+model <-  'F1 = 12,14,15,37,38,51,52,53'
+
+Factor1_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor1_Parameters)
+
+#which items should be a plot be created  = 12,14,15,37,38,51,52,53
+colnames(Reduced_DF [,(c(12,14,15,37,38,51,52,53)+2)])
+pdf("Factor1_ItemFit_NC3V.pdf")
+par(mfrow=c(6,2))
+itemfit(Factor1_Model_Global, empirical.plot = 12)
+itemfit(Factor1_Model_Global, empirical.plot = 14)
+itemfit(Factor1_Model_Global, empirical.plot = 15)
+itemfit(Factor1_Model_Global, empirical.plot = 37)
+itemfit(Factor1_Model_Global, empirical.plot = 38)
+itemfit(Factor1_Model_Global, empirical.plot = 51)
+itemfit(Factor1_Model_Global, empirical.plot = 52)
+itemfit(Factor1_Model_Global, empirical.plot = 53)
+dev.off()
+```
+
+```{r Factor 2 - Item Fit}
+Parameters_F2 <- Coef_112[,c(2,6:15)]
+names(Parameters_F2)[1] <- "a1"
+
+#while this does create the model, it does not have any data
+Factor2_Model <- generate.mirt_object(Parameters_F2,ItemType_ReducedDF)
+Factor2_Parameters <- mod2values(Factor2_Model)
+Factor2_Parameters$item <- itemlist
+
+model <-  'F2 = 1,2,3,4,5,6,7,8,9,10,11,14,18,52'
+
+Factor2_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor2_Parameters)
+
+
+#which items should be a plot be created F2 = 1,2,3,4,5,6,7,8,9,10,11,14,18,52
+colnames(Reduced_DF [,(c(1,2,3,4,5,6,7,8,9,10,11,14,18,52)+2)])
+pdf("Factor2_ItemFit_NC3O.pdf")
+par(mfrow=c(7,2))
+itemfit(Factor2_Model_Global, empirical.plot = 1)
+itemfit(Factor2_Model_Global, empirical.plot = 2)
+itemfit(Factor2_Model_Global, empirical.plot = 3)
+itemfit(Factor2_Model_Global, empirical.plot = 4)
+itemfit(Factor2_Model_Global, empirical.plot = 5)
+itemfit(Factor2_Model_Global, empirical.plot = 6)
+itemfit(Factor2_Model_Global, empirical.plot = 7)
+itemfit(Factor2_Model_Global, empirical.plot = 8)
+itemfit(Factor2_Model_Global, empirical.plot = 9)
+itemfit(Factor2_Model_Global, empirical.plot = 10)
+itemfit(Factor2_Model_Global, empirical.plot = 11)
+itemfit(Factor2_Model_Global, empirical.plot = 14)
+itemfit(Factor2_Model_Global, empirical.plot = 18)
+itemfit(Factor2_Model_Global, empirical.plot = 52)
+dev.off()
+```
+
+```{r  Factor 2 - Item Fit, Varimax, eval=FALSE}
+model <-  'F2 = 1,2,3,4,5,6,7,8,9,10,11,13,16,17,51'
+
+Factor2_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor2_Parameters)
+
+
+#which items should be a plot be created F2 = 1,2,3,4,5,6,7,8,9,10,11,13,16,17,51
+colnames(Reduced_DF [,(c(1,2,3,4,5,6,7,8,9,10,11,13,16,17,51)+2)])
+pdf("Factor2_ItemFit.pdf")
+par(mfrow=c(7,2))
+itemfit(Factor2_Model_Global, empirical.plot = 1)
+itemfit(Factor2_Model_Global, empirical.plot = 2)
+itemfit(Factor2_Model_Global, empirical.plot = 3)
+itemfit(Factor2_Model_Global, empirical.plot = 4)
+itemfit(Factor2_Model_Global, empirical.plot = 5)
+itemfit(Factor2_Model_Global, empirical.plot = 6)
+itemfit(Factor2_Model_Global, empirical.plot = 7)
+itemfit(Factor2_Model_Global, empirical.plot = 8)
+itemfit(Factor2_Model_Global, empirical.plot = 9)
+itemfit(Factor2_Model_Global, empirical.plot = 10)
+itemfit(Factor2_Model_Global, empirical.plot = 11)
+itemfit(Factor2_Model_Global, empirical.plot = 16)
+itemfit(Factor2_Model_Global, empirical.plot = 17)
+itemfit(Factor2_Model_Global, empirical.plot = 51)
+dev.off()
+```
+
+```{r Factor 3 - Item Fit}
+Parameters_F3 <- Coef_112[,c(3,6:15)]
+names(Parameters_F3)[1] <- "a1"
+
+#while this does create the model, it does not have any data
+Factor3_Model <- generate.mirt_object(Parameters_F3,ItemType_ReducedDF)
+Factor3_Parameters <- mod2values(Factor3_Model)
+Factor3_Parameters$item <- itemlist
+
+model <-  'F3 = 46,47,48,49,50,51,55'
+
+Factor3_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor3_Parameters)
+
+
+colnames(Reduced_DF [,(c(46,47,48,49,50,51,55)+2)])
+pdf("Factor3_ItemFit_NC3O.pdf")
+par(mfrow=c(3,2))
+itemfit(Factor3_Model_Global, empirical.plot = 46)
+itemfit(Factor3_Model_Global, empirical.plot = 47)
+itemfit(Factor3_Model_Global, empirical.plot = 48)
+itemfit(Factor3_Model_Global, empirical.plot = 49)
+itemfit(Factor3_Model_Global, empirical.plot = 50)
+itemfit(Factor3_Model_Global, empirical.plot = 51)
+itemfit(Factor3_Model_Global, empirical.plot = 55)
+dev.off()
+```
+
+```{r  Factor 3 - Item Fit, Varimax, eval=FALSE}
+#same variables just different number of variables so they are referenced differently.
+
+model <-  'F3 = 45,46,47,48,49,50,54'
+
+Factor3_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor3_Parameters)
+
+
+colnames(Reduced_DF [,(c(45,46,47,48,49,50,54)+2)])
+pdf("Factor3_ItemFit_NC3V.pdf")
+par(mfrow=c(3,2))
+itemfit(Factor3_Model_Global, empirical.plot = 45)
+itemfit(Factor3_Model_Global, empirical.plot = 46)
+itemfit(Factor3_Model_Global, empirical.plot = 47)
+itemfit(Factor3_Model_Global, empirical.plot = 48)
+itemfit(Factor3_Model_Global, empirical.plot = 49)
+itemfit(Factor3_Model_Global, empirical.plot = 50)
+itemfit(Factor3_Model_Global, empirical.plot = 54)
+dev.off()
+```
+
+```{r Factor 4 - Item Fit}
+Parameters_F4 <- Coef_112[,c(4,6:15)]
+names(Parameters_F4)[1] <- "a1"
+
+#while this does create the model, it does not have any data
+Factor4_Model <- generate.mirt_object(Parameters_F4,ItemType_ReducedDF)
+Factor4_Parameters <- mod2values(Factor4_Model)
+Factor4_Parameters$item <- itemlist
+
+model <-  'F4 = 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36'
+
+Factor4_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor4_Parameters)
+
+
+#which items should be a plot be created F4 = 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+colnames(Reduced_DF [,(c(19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36)+2)])
+pdf("Factor4_ItemFit.pdf")
+par(mfrow=c(7,2))
+itemfit(Factor4_Model_Global, empirical.plot = 19)
+itemfit(Factor4_Model_Global, empirical.plot = 20)
+itemfit(Factor4_Model_Global, empirical.plot = 21)
+itemfit(Factor4_Model_Global, empirical.plot = 22)
+itemfit(Factor4_Model_Global, empirical.plot = 23)
+itemfit(Factor4_Model_Global, empirical.plot = 24)
+itemfit(Factor4_Model_Global, empirical.plot = 25)
+itemfit(Factor4_Model_Global, empirical.plot = 26)
+itemfit(Factor4_Model_Global, empirical.plot = 27)
+itemfit(Factor4_Model_Global, empirical.plot = 28)
+itemfit(Factor4_Model_Global, empirical.plot = 29)
+itemfit(Factor4_Model_Global, empirical.plot = 30)
+itemfit(Factor4_Model_Global, empirical.plot = 31)
+itemfit(Factor4_Model_Global, empirical.plot = 32)
+itemfit(Factor4_Model_Global, empirical.plot = 33)
+itemfit(Factor4_Model_Global, empirical.plot = 34)
+itemfit(Factor4_Model_Global, empirical.plot = 35)
+itemfit(Factor4_Model_Global, empirical.plot = 36)
+dev.off()
+```
+
+```{r Factor 4 - Item Fit, Varimax, eval=FALSE}
+model <-  'F4 = 18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36'
+
+Factor4_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor4_Parameters)
+
+
+#which items should be a plot be created F4 = 18, 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+colnames(Reduced_DF [,(c(18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36)+2)])
+pdf("Factor4_ItemFit_NC3O.pdf")
+par(mfrow=c(7,2))
+itemfit(Factor4_Model_Global, empirical.plot = 18)
+itemfit(Factor4_Model_Global, empirical.plot = 19)
+itemfit(Factor4_Model_Global, empirical.plot = 20)
+itemfit(Factor4_Model_Global, empirical.plot = 21)
+itemfit(Factor4_Model_Global, empirical.plot = 22)
+itemfit(Factor4_Model_Global, empirical.plot = 23)
+itemfit(Factor4_Model_Global, empirical.plot = 24)
+itemfit(Factor4_Model_Global, empirical.plot = 25)
+itemfit(Factor4_Model_Global, empirical.plot = 26)
+itemfit(Factor4_Model_Global, empirical.plot = 27)
+itemfit(Factor4_Model_Global, empirical.plot = 28)
+itemfit(Factor4_Model_Global, empirical.plot = 29)
+itemfit(Factor4_Model_Global, empirical.plot = 30)
+itemfit(Factor4_Model_Global, empirical.plot = 31)
+itemfit(Factor4_Model_Global, empirical.plot = 32)
+itemfit(Factor4_Model_Global, empirical.plot = 33)
+itemfit(Factor4_Model_Global, empirical.plot = 34)
+itemfit(Factor4_Model_Global, empirical.plot = 35)
+itemfit(Factor4_Model_Global, empirical.plot = 36)
+dev.off()
+```
+
+```{r Factor 5 - Item Fit}
+Parameters_F5 <- Coef_112[,c(5,6:15)]
+names(Parameters_F5)[1] <- "a1"
+
+#while this does create the model, it does not have any data
+Factor5_Model <- generate.mirt_object(Parameters_F5,ItemType_ReducedDF)
+Factor5_Parameters <- mod2values(Factor5_Model)
+Factor5_Parameters$item <- itemlist
+
+model <-  'F5 = 40,41,42,43,44,45'
+
+Factor5_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor5_Parameters)
+
+
+#which items should be a plot be created F5 = 40,41,42,43,44,45
+colnames(Reduced_DF [,(c(F5 = 40,41,42,43,44,45)+2)])
+pdf("Factor5_ItemFit_NC3O.pdf")
+par(mfrow=c(3,2))
+itemfit(Factor5_Model_Global, empirical.plot = 40)
+itemfit(Factor5_Model_Global, empirical.plot = 41)
+itemfit(Factor5_Model_Global, empirical.plot = 42)
+itemfit(Factor5_Model_Global, empirical.plot = 43)
+itemfit(Factor5_Model_Global, empirical.plot = 44)
+itemfit(Factor5_Model_Global, empirical.plot = 45)
+dev.off()
+```
+
+```{r Factor 5 - Item Fit, Varimax, eval=FALSE}
+#same variables just different number of variables so they are referenced differently.
+model <-  'F5 = 39,40,41,42,43,44'
+
+Factor5_Model_Global <- mirt(Reduced_DF[,c(3:ncol(Reduced_DF))],
+                      model = model,
+                      itemtype = ItemType_ReducedDF,
+                      TOL=NA,
+                      survey.weights=Reduced_DF$Individual_MIRTData.V258.x,
+                      pars=Factor5_Parameters)
+
+
+#which items should be a plot be created F5 = 39,40,41,42,43,44
+colnames(Reduced_DF [,(c(F5 = 39,40,41,42,43,44)+2)])
+pdf("Factor5_ItemFit.pdf")
+par(mfrow=c(3,2))
+itemfit(Factor5_Model_Global, empirical.plot = 39)
+itemfit(Factor5_Model_Global, empirical.plot = 40)
+itemfit(Factor5_Model_Global, empirical.plot = 41)
+itemfit(Factor5_Model_Global, empirical.plot = 42)
+itemfit(Factor5_Model_Global, empirical.plot = 43)
+itemfit(Factor5_Model_Global, empirical.plot = 44)
+dev.off()
+```
+

@@ -1,0 +1,45 @@
+,V1,Description.x,R_squared,V2,Description.y
+6,V106_3,I do not trust people of another religion very much,0.754140995,V107_3,I do not trust people of another nationality very much. 
+15,V110_4,I have no confidence in the press at all,0.800909428,V111_4,I have no confidence in television at all
+28,V115_4,I have no confidence at all in the government,0.745047133,V117_4,I have no confidence at all in parliament. 
+29,V116_4,I have no confindence at all in political parties,0.810003291,V117_4,I have no confidence at all in parliament. 
+34,V124_4,I do not have any confidence in humanitarian organizations,0.751542748,V122_4,I do not have any confidence in environmental organizations
+38,V122_4,I do not have any confidence in environmental organizations,0.78921732,V123_4,I do not have any confidence in women's organizations
+50,V150_4,The meaning of religion is to both folllow religious norms and cermemonies and to do good to other people. ,1,V151_4,The meaning of religion is both to make sense of the life after death or to make sense of life in this world. 
+58,V179_1_Ref,I have been the vicitim of a crime during the past year,0.755844156,V180_1_Ref,My family has been vicitms of a crime during the last year. 
+65,V184_1_Ref,I am very worried about a terrorist attack. ,0.887012987,V183_1_Ref,I am very much worried about a war involving my country
+64,V185_1_Ref,I am very much worried about a civil war,0.800909428,V183_1_Ref,I am very much worried about a war involving my country
+72,V183_1_Ref,I am very much worried about a war involving my country,0.887012987,V184_1_Ref,I am very worried about a terrorist attack. 
+93,V188_4,I never have gone without enough food to eat in the last 12 month,0.72987013,V190_4,I have never gone without medicine or medical treatment that I needed in the last 12 month.
+100,V206_ Very High,I think that sex before marriage is always justifable,0.719747608,V205_ Very High,I think that divorse is always justifable
+101,V205_ Very High,I think that divorse is always justifable,0.719747608,V206_ Very High,I think that sex before marriage is always justifable
+103,V214_2,I agree that I see myself as part of my country,0.771029596,V213_2,I agree that I see myself as part of my local community 
+104,V212_2,I agree that I see myself as a world citizen,0.726859408,V213_2,I agree that I see myself as part of my local community 
+111,V222_1_Ref,I use email daily to obtain information about what is going on in the country and the world. ,0.781392323,V223_1_Ref,I use the internet daily to obtain information about what is going on in the country and the world. 
+117,V223_1_Ref,I use the internet daily to obtain information about what is going on in the country and the world. ,0.731232067,V225_3,I frequently use a personal computer
+121,V226_1_Ref,I always vote in the local elections,0.794413813,V227_1_Ref,I always vote in the national elections
+124,V244_1_Ref,My father is an immigrant,0.918600899,V243_1_Ref,My mother is an immigrant
+143,V26_0,I am not am member in a sport or recreational organization ,0.821312714,V27_0,"I am not a member in an art, music, or educaitoncal organization"
+129,V27_0,"I am not a member in an art, music, or educaitoncal organization",0.821312714,V26_0,I am not am member in a sport or recreational organization 
+180,V30_0,I am not a member in an environmental organization,0.803896104,V31_0,I am not a member of a professional association
+200,V31_0,I am not a member of a professional association,0.816883117,V32_0,I am not a member of a humanitarian or charitable organization
+186,V32_0,I am not a member of a humanitarian or charitable organization,0.816883117,V31_0,I am not a member of a professional association
+158,V33_0,I am not a member of a consumer organization,0.793506494,V30_0,I am not a member in an environmental organization
+164,V34_0,"I am not a member of self-help group, mutual, aid group",0.797402597,V30_0,I am not a member in an environmental organization
+284,V100_Low,"I mostly agree that in the long run, hard work usually brings a better life",0.756739241,V99_Low,I mostly agree that competition is good it stimulates people to work hard and develop new ideas
+273,V146_1_Ref,I pray several times a day apart from weddings and funerals,0.722962039,V9_1_Ref,Religion is very important in my life
+276,V153_1_Ref,"I strongly agree that whenever science and religion conflict, religion is always right. ",0.753736351,V9_1_Ref,Religion is very important in my life
+274,V19_1_Ref,Religious faith is am important quality that children can be encouraged to learn at home.,0.779220779,V9_1_Ref,Religion is very important in my life
+275,V49_1_Ref,I strongly agree that one of my main goals in life has been to make my parents proud,0.702597403,V9_1_Ref,Religion is very important in my life
+236,V203_Very Low_Ref,I think that homosexuality is never justifable.,0.728571429,V40_1_Ref,I would not like to have homosexuals as neighbors
+238,V37_1_Ref,I would not like to have people of a different race as neighbors,0.779220779,V41_1_Ref,I would not like to have people of a different religion as neighbors
+240,V41_1_Ref,I would not like to have people of a different religion as neighbors,0.701298701,V43_1_Ref,I would not like to have unmarried couples living together as neighbors
+234,V44_1_Ref,I would not like to have people who speak a different language,0.741149763,V37_1_Ref,I would not like to have people of a different race as neighbors
+245,V45_1_Ref,"I agree that if jobs are scarce, men should have more right to a job than women ",0.709090909,V51_1_Ref,"I strongly agree that on the whole, men make better political leaders than women do"
+255,V51_1_Ref,"I strongly agree that on the whole, men make better political leaders than women do",0.846753247,V53_1_Ref,"I strongly agree that on the whole, men make better business executives than women do "
+254,V52_1_Ref,I strongly agree that a university education is more important for a boy than for a girl,0.754545455,V53_1_Ref,"I strongly agree that on the whole, men make better business executives than women do "
+247,V53_1_Ref,"I strongly agree that on the whole, men make better business executives than women do ",0.846753247,V51_1_Ref,"I strongly agree that on the whole, men make better political leaders than women do"
+260,V75_1_Ref,Being very successful and having people recognize one's achievements is very much like me,0.700876945,V76_1_Ref,"Adventure, taking risks, and having an exciting life is very much like me"
+263,V85_3,I would never sign a petition,0.709824333,V86_3,I woud never join in boycotts
+270,V87_3,I would never attend a peaceful demonstration,0.768379961,V88_3,I would never join strikes
+269,V89_3,I would never do any other act of protest,0.737432182,V88_3,I would never join strikes

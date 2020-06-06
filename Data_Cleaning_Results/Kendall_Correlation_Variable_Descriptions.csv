@@ -1,0 +1,141 @@
+,VariablestoKeep,Description 
+1,V9_1_Ref,Religion is very important in my life
+2,V9_3,Religion is not very important in my life
+3,V9_4,Religion is not important at all in my life
+4,V19_1_Ref,Religious faith is am important quality that children can be encouraged to learn at home.
+5,V26_0,I am not am member in a sport or recreational organization 
+6,V26_1_Ref,I am an inactive member in a sport or recreational organization
+7,V26_2,I am an active member in a sport or recreational organization
+8,V27_0,"I am not a member in an art, music, or educaitoncal organization"
+9,V27_1_Ref,"I am an inactive member in an art, music, or educational organization"
+10,V27_2,"I am an anctive member in an art, music, or educational organization"
+11,V30_0,I am not a member in an environmental organization
+12,V30_1_Ref,I am an inactive member in a environmental organization
+13,V31_0,I am not a member of a professional association
+14,V31_1_Ref,I am an inactive member of a professional association 
+15,V32_0,I am not a member of a humanitarian or charitable organization
+16,V32_1_Ref,I am an inactive member of a humanitarian or charitable organization
+17,V33_0,I am not a member of a consumer organization
+18,V33_1_Ref,I am an inactive member of a consumer organization
+19,V34_0,"I am not a member of self-help group, mutual, aid group"
+20,V34_1_Ref,"I am an inactive member of a self-help group, mutual, aid group"
+21,V37_1_Ref,I would not like to have people of a different race as neighbors
+22,V40_1_Ref,I would not like to have homosexuals as neighbors
+23,V41_1_Ref,I would not like to have people of a different religion as neighbors
+24,V43_1_Ref,I would not like to have unmarried couples living together as neighbors
+25,V44_1_Ref,I would not like to have people who speak a different language
+26,V75_1_Ref,Being very successful and having people recognize one's achievements is very much like me
+27,V76_1_Ref,"Adventure, taking risks, and having an exciting life is very much like me"
+28,V45_1_Ref,"I agree that if jobs are scarce, men should have more right to a job than women "
+29,V49_1_Ref,I strongly agree that one of my main goals in life has been to make my parents proud
+30,V51_1_Ref,"I strongly agree that on the whole, men make better political leaders than women do"
+31,V51_2,"I agree that on the whole, men make better political leaders than women"
+32,V51_3,"I disagree that on the whole, men make better political leaders than women"
+33,V51_4,"I strongly disagree that on the whole, men make better political leaders than women "
+34,V52_1_Ref,I strongly agree that a university education is more important for a boy than for a girl
+35,V53_1_Ref,"I strongly agree that on the whole, men make better business executives than women do "
+36,V53_2,"I agree that on the whole, men make better business executives than women do"
+37,V53_3,"I disagree that on the whole, men make better business executive than women do "
+38,V53_4,"I strongly disagree that on the whole, men make better business executive than women do"
+39,V85_3,I would never sign a petition
+40,V86_3,I woud never join in boycotts
+41,V87_2,I might attend a peaceful demonstration
+42,V87_3,I would never attend a peaceful demonstration
+43,V88_2,I might join in strikes
+44,V88_3,I would never join strikes
+45,V89_3,I would never do any other act of protest
+46,V110_1_Ref,I have a great deal of confidence in the press
+47,V110_2,I have quite a lot of confidence in the press
+48,V110_3,I do not very much confidence in the press
+49,V110_4,I have no confidence in the press at all
+50,V111_1_Ref,I have a great deal of confidence in television
+51,V111_2,I have quite a lot of confidence in television
+52,V111_3,I do not have very much confidence in television
+53,V111_4,I have no confidence in television at all
+54,V115_1_Ref,I have a great deal of confidence in the government.
+55,V115_3,I do not have a lot of confidence in the government
+56,V115_4,I have no confidence at all in the government
+57,V116_1_Ref,I have a great deal of confidence in political parties
+58,V116_2,I have quite a lot of confidence in political parties
+59,V116_4,I have no confindence at all in political parties
+60,V117_1_Ref,I have a great deal of confidence in parliament
+61,V117_2,I have quite a lot of confidence in parliament
+62,V117_3,I  do not have very much confidence in parliament
+63,V117_4,I have no confidence at all in parliament. 
+64,V122_1_Ref,I have a great deal of confidence in environmental organizations
+65,V122_2,I have quite a lot of confidence in environmental organizations
+66,V122_3,I do not have very much confidence in environmental organizations
+67,V122_4,I do not have any confidence in environmental organizations
+68,V123_1_Ref,I have a great deal of confidence in women's organizations
+69,V123_2,I have a great of confidence in women's organizations
+70,V123_3,I do not have very much confidence in women's organizations
+71,V123_4,I do not have any confidence in women's organizations
+72,V124_4,I do not have any confidence in humanitarian organizations
+73,V222_1_Ref,I use email daily to obtain information about what is going on in the country and the world. 
+74,V222_2,I use email weekly to obtain information about what is going on in the country and the world.
+75,V222_4,I use email less than monthly to obtain information about what is going on in the country and the world. 
+76,V222_5,I never use email to obtain information about what is going on in the country and the world.
+77,V223_1_Ref,I use the internet daily to obtain information about what is going on in the country and the world. 
+78,V223_2,I use the internet weekly to obtain information about what is going on in the country and the world.
+79,V223_4,I use the internet less than monthly to obtain information about what is going on in the country and the world. 
+80,V223_5,I never use the internet to obtain information about what is going on in the country and the world.
+81,V225_1_Ref,I never use a personal computer
+82,V225_3,I frequently use a personal computer
+83,V226_1_Ref,I always vote in the local elections
+84,V226_2,I usually vote in the local elections
+85,V226_3,I never vote in the local elections
+86,V227_1_Ref,I always vote in the national elections
+87,V227_2,I usually vote in the national elections
+88,V227_3,I never vote in the national elections
+89,V146_1_Ref,I pray several times a day apart from weddings and funerals
+90,V150_3,The meaning of religion is not to follow religious norms and ceremonies or to do good to other people
+91,V150_4,The meaning of religion is to both folllow religious norms and cermemonies and to do good to other people. 
+92,V151_3,The meaning of religion in not to make sense of the life after death or to make sense of life in this world. 
+93,V151_4,The meaning of religion is both to make sense of the life after death or to make sense of life in this world. 
+94,V153_1_Ref,"I strongly agree that whenever science and religion conflict, religion is always right. "
+95,V153_4,"I strong disagree that whenever science and religion conflict, relgion is always right"
+96,V106_2,I somewhat trust people of another religion
+97,V106_3,I do not trust people of another religion very much
+98,V106_4,I do not trust people of another religion at all. 
+99,V107_2,I somewhat trust people of another nationality 
+100,V107_3,I do not trust people of another nationality very much. 
+101,V107_4,I do not trust people of another nationality at all. 
+102,V212_2,I agree that I see myself as a world citizen
+103,V213_2,I agree that I see myself as part of my local community 
+104,V214_2,I agree that I see myself as part of my country
+105,V243_1_Ref,My mother is an immigrant
+106,V244_1_Ref,My father is an immigrant
+107,V179_1_Ref,I have been the vicitim of a crime during the past year
+108,V180_1_Ref,My family has been vicitms of a crime during the last year. 
+109,V181_1_Ref,I am very much worried about losing my job or not finding a job. 
+110,V181_4,I am not worried at all about losing my job or not finding a job
+111,V182_1_Ref,I am very much worried about not being able to give my children a good education. 
+112,V182_4,I am not worried at all about not being able to give my children a good education
+113,V183_1_Ref,I am very much worried about a war involving my country
+114,V183_2,I am a great deal worried about a war involving my country
+115,V183_3,I am not worried much about a war involving my country
+116,V183_4,I am not worried at all about a war involving my country
+117,V184_1_Ref,I am very worried about a terrorist attack. 
+118,V184_2,I am worried a great deal about a terroriest attack.
+119,V184_3,I am not worried much about a terrorist attack 
+120,V184_4,I am not worried at all about a terrorist attack
+121,V185_1_Ref,I am very much worried about a civil war
+122,V185_3,I am not worried much about a civil war
+123,V185_4,I am not worried at all about a civil war
+124,V188_3,I rarley have gone without enough food to eat in the last 12 month
+125,V188_4,I never have gone without enough food to eat in the last 12 month
+126,V190_3,I have rarely gone without medicine or medical treatment that I needed in the last 12 month.
+127,V190_4,I have never gone without medicine or medical treatment that I needed in the last 12 month.
+128,V99_Low,I mostly agree that competition is good it stimulates people to work hard and develop new ideas
+129,V100_Low,"I mostly agree that in the long run, hard work usually brings a better life"
+130,V200_Med,I am indifferent to the justification of stealling property
+131,V202_Med,I am indifferent to the justification of someone accepting a bribe in the course of their duties.
+132,V203_Very Low_Ref,I think that homosexuality is never justifable.
+133,V203_ Very High,I think that homosexuality is always justifable
+134,V204_ Very High,I think that abortion is always justifable
+135,V205_ Very High,I think that divorse is always justifable
+136,V206_ Very High,I think that sex before marriage is always justifable
+137,V231_Med,I do a mix of manual and intellectual tasks at work
+138,V232_Med,I do a mix of rountine and creative tasks at work
+139,V232_High,I do mainly creative (not rountine) tasks at work
+140,V233_High,I am mostly independen in performing my tasks at work.
